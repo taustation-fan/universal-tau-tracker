@@ -198,7 +198,7 @@ function extract_local_shuttles(options, station) {
         record_career_tasks(options, station);
     }
     else {
-        let url = base_url + 'station-needs-update/' + encodeURIComponent(station.station) + '/' + encodeURIComponent(station.system);
+        let url = base_url + 'station-needs-update/' + encodeURIComponent(station.system) + '/' + encodeURIComponent(station.name);
         console.log('getting ' + url);
         $.get(url, function (response) {
             console.log('Response: ', response);

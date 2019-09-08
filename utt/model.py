@@ -11,13 +11,13 @@ def get_station(system_name, station_name, create=True):
         assert create, 'No such system {}'.format(system_name)
         system = System(name=system_name)
         db.session.add(system)
-    station = Station.query.filter(Station.system_id == system.id, Station.name == station_name).first()
+    station = Station.query.filter(Station.system_id == system.id, Station.name_lower == station_name.lower()).first()
     if not station:
         assert create, 'No such station {} in {} system'.format(station_name, system_name)
 
         assert not ('Confined to the' in station_name or 'Doing activity' in station_name), \
             '{} does not look like a proper station name'.format(station_name)
-        station = Station(system=system, name=station_name)
+        station = Station(system=system, name=station_name, name_lower=station_name.lower())
         db.session.add(station)
     return station
 
@@ -31,6 +31,7 @@ class Station(db.Model):
     system_id = db.Column(db.ForeignKey('system.id'), nullable=False)
     system = db.relationship('System')
     name = db.Column(db.String(200), unique=True, nullable=False)
+    name_lower = db.Column(db.String(200), unique=True, nullable=False)
 
 class Character(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -87,7 +88,7 @@ class CareerTaskReading(db.Model):
 
 ## Station distances
 def get_station_pair(a, b):
-    (station_a, station_b) = sorted((a, b), key=lambda x: x.name)
+    (station_a, station_b) = sorted((a, b), key=lambda x: x.name_lower)
     pair = StationPair.query.filter_by(station_a_id=station_a.id, station_b_id=station_b.id).first()
     if pair is None:
         pair = StationPair(
