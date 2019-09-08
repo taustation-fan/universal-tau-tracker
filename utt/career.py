@@ -81,7 +81,6 @@ def career_task_add():
     stations = Station.query.filter_by(system_id=station.system_id)
     system_factors = {}
     for st in stations.all():
-        print('station name: {}'.format(st.name))
         if st.name == station_name:
             continue
         bs = CareerBatchSubmission.query.filter_by(station_id=st.id).order_by(CareerBatchSubmission.when.desc()).first()
