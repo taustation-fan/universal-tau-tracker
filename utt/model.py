@@ -12,9 +12,11 @@ def get_station(system_name, station_name, create=True):
         system = System(name=system_name)
         db.session.add(system)
     station = Station.query.filter(Station.system_id == system.id, Station.name == station_name).first()
-    print('Found station {}'.format(station))
     if not station:
         assert create, 'No such station {} in {} system'.format(station_name, system_name)
+
+        assert not ('Confined to the' in station_name or 'Doing activity' in station_name), \
+            '{} does not look like a proper station name'.format(station_name)
         station = Station(system=system, name=station_name)
         db.session.add(station)
     return station
@@ -84,6 +86,19 @@ class CareerTaskReading(db.Model):
         return self.bonus / baseline
 
 ## Station distances
+def get_station_pair(a, b):
+    (station_a, station_b) = sorted((a, b), key=lambda x: x.name)
+    pair = StationPair.query.filter_by(station_a_id=station_a.id, station_b_id=station_b.id).first()
+    if pair is None:
+        pair = StationPair(
+            station_a=station_a,
+            station_b=station_b,
+            system=a.system,
+        )
+        db.session.add(pair)
+    return pair
+            
+
 class StationPair(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 

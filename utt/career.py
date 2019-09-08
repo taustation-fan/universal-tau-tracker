@@ -14,9 +14,7 @@ from utt.model import db, \
                       Token, \
                       CareerBatchSubmission, \
                       CareerTask, \
-                      CareerTaskReading, \
-                      StationPair, \
-                      StationDistanceReading
+                      CareerTaskReading
 
 @app.route('/v1/career-task/add', methods=['POST'])
 def career_task_add():

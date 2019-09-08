@@ -144,7 +144,7 @@ function extract_local_shuttles(options, station) {
         system: station.system,
         schedules: schedules,
     }
-    let url = options.base_url + 'career-task/add';
+    let url = options.base_url + 'distance/add';
 
     $.ajax({
         type: "POST",
