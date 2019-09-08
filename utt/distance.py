@@ -21,6 +21,7 @@ from utt.model import db, \
 @app.route('/v1/distance/add', methods=['POST'])
 def add_distance():
     payload = request.get_json(force=True)
+    print(json.dumps(payload, indent=4, sort_keys=True))
     mandatory = set(('token', 'source', 'system', 'schedules'))
     missing_attrs = [a for a in mandatory if not payload.get(a)]
     if missing_attrs:

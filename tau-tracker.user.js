@@ -72,7 +72,7 @@ function record_career_tasks(options, station) {
         tasks: tasks,
     };
 
-    let url = options.base_url + 'career-task/add';
+    let url = options.base_url + 'v1/career-task/add';
 
     $.ajax({
         type: "POST",
@@ -145,7 +145,7 @@ function extract_local_shuttles(options, station) {
         system: station.system,
         schedules: schedules,
     }
-    let url = options.base_url + 'distance/add';
+    let url = options.base_url + 'v1/distance/add';
 
     $.ajax({
         type: "POST",
@@ -169,7 +169,7 @@ function extract_local_shuttles(options, station) {
 
 (function() {
     'use strict';
-    let base_url = 'http://127.0.0.1:5000/v1/';
+    let base_url = 'https://tracker.tauguide.de/';
 
     function pref_specs() {
         return {
@@ -181,6 +181,12 @@ function extract_local_shuttles(options, station) {
                     label: 'Access Token',
                     type: 'text',
                     default: '',
+                },
+                {
+                    key: 'base_url',
+                    label: 'Base API URL (leave empty for default)',
+                    type: 'text',
+                    default: '',
                 }
             ],
         };
@@ -189,7 +195,9 @@ function extract_local_shuttles(options, station) {
     var station = get_station();
     // must always be called, otherwise preference editing breaks
     let options = userscript_preferences( pref_specs() );
-    options.base_url = base_url;
+    if (!options.base_url) {
+        options.base_url = base_url;
+    }
     if (!station) {
         return;
     }
@@ -198,10 +206,8 @@ function extract_local_shuttles(options, station) {
         record_career_tasks(options, station);
     }
     else {
-        let url = base_url + 'station-needs-update/' + encodeURIComponent(station.system) + '/' + encodeURIComponent(station.name);
-        console.log('getting ' + url);
+        let url = base_url + 'v1/career-task/station-needs-update/' + encodeURIComponent(station.system) + '/' + encodeURIComponent(station.name);
         $.get(url, function (response) {
-            console.log('Response: ', response);
             if (response.needs_update) {
                 $('span.employment-title:contains(Career)').parent().append('– <a href="/career">Check tasks</a>');
             }
