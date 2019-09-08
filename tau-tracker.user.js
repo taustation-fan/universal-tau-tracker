@@ -15,8 +15,8 @@ function get_station() {
     var match = full_station.match(/([^,]+), (.*?)\s+system/);
     if (match) {
         return {
-            station: match[0],
-            system: match[1],
+            station: match[1],
+            system: match[2],
         }
     }
 }
@@ -124,7 +124,7 @@ function extract_local_shuttles(options, station) {
     }
 
     var schedules = [];
-    var departure = $('html').data('time');
+    // var departure = $('html').data('time');
     $('.area-table-item').each(function() {
         let $table = $(this);
         let destination = $table.find('.area-table-title span').text();
@@ -132,6 +132,7 @@ function extract_local_shuttles(options, station) {
         $table.find('li.ticket-schedule-row').each(function() {
             let $row = $(this);
             let distance = $row.find('.ticket-col-distance').find('dd').text().replace(/\s*km/, '');
+            let departure = $row.find('.ticket-col-departure').find('dd').text();
             if (distance.length) {
                 distances.push([departure, parseInt(distance, 10)]);
             }
@@ -207,6 +208,6 @@ function extract_local_shuttles(options, station) {
         });
     }
     if (window.location.pathname.match('^/area/local-shuttles')) {
-        extract_local_shuttles()
+        extract_local_shuttles(options, station);
     }
 }());
