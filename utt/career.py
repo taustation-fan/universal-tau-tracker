@@ -85,8 +85,9 @@ def career_task_add():
         if st.name == station_name:
             continue
         bs = CareerBatchSubmission.query.filter_by(station_id=st.id).order_by(CareerBatchSubmission.when.desc()).first()
-        factor = max(o.factor for o in bs.readings)
-        system_factors[st.name] = factor
+        if bs:
+            factor = max(o.factor for o in bs.readings)
+            system_factors[st.name] = factor
     if system_factors:
         response['system_factors'] = system_factors
   
