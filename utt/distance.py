@@ -21,7 +21,6 @@ from utt.model import db, \
 @app.route('/v1/distance/add', methods=['POST'])
 def add_distance():
     payload = request.get_json(force=True)
-    print(json.dumps(payload, indent=4, sort_keys=True))
     mandatory = set(('token', 'source', 'system', 'schedules'))
     missing_attrs = [a for a in mandatory if not payload.get(a)]
     if missing_attrs:
@@ -34,11 +33,13 @@ def add_distance():
         return jsonify({'recorded': False, 'message': 'Invalid token'})
 
     station = get_station(payload['system'], payload['source'])
+    count = 0
     for schedule in payload['schedules']:
         destination = get_station(payload['system'], schedule['destination'])
         pair = get_station_pair(station, destination)
         for (departure, distance) in schedule['distances']:
             departure = parse_utc(departure) or departure
+            count += 1
             sdr = StationDistanceReading(
                 station_pair=pair,
                 distance_km=distance,
@@ -47,4 +48,5 @@ def add_distance():
             )
             db.session.add(sdr)
     db.session.commit()
+    print('Recorded {} distance pairs for {} by {}'.format(count, payload['source'], token.character.name))
     return jsonify({'recorded': True, 'message': 'Success'})

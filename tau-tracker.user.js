@@ -64,7 +64,7 @@ function record_career_tasks(options, station) {
     }
 
     var payload = {
-        token: token,
+        token: options.token,
         station: station.station,
         system: station.system,
         career: career,
@@ -167,6 +167,62 @@ function extract_local_shuttles(options, station) {
     });
 }
 
+function extract_docks(options, station) {
+    if (!$('html').hasClass('cockpit')) {
+        return;
+    }
+    var token = options.token;
+    if (!token) {
+        status_message('Please configure your access token in the user preferences');
+        return;
+    }
+    var departure = $('html').data('time');
+    var schedules = [];
+    $('.area-table-item').each(function() {
+        let $table = $(this);
+        let distances = [];
+        let destination = $table.find('.area-table-title').find('span').text();
+
+        $table.find('li.ticket-schedule-row').each(function() {
+            let $row = $(this);
+            let distance = parseInt($row.find('.ticket-col-distance').find('dd').text().replace(/\s*km/, ''), 10)
+            if (departure.length) {
+                distances.push([departure, distance]);
+            }
+        });
+        schedules.push({'destination': destination, 'distances': distances});
+    });
+    var payload = {
+        token: token,
+        source: station.station,
+        system: station.system,
+        schedules: schedules,
+    }
+    console.log(payload);
+    return;
+
+    let url = options.base_url + 'v1/distance/add';
+
+    $.ajax({
+        type: "POST",
+        url: url,
+        dataType: 'json',
+        data: JSON.stringify(payload),
+        success: function(response) {
+            if (response.recorded) {
+                let message = 'Station distances recorded. +1 brownie point!';
+                status_message(message);
+            }
+            else {
+                status_message('error station distances: ' + response.message);
+            }
+        },
+        error: function(xhr) {
+            status_message('cannot talk to ' + url + ': ' + xhr.response_text);
+        },
+    });
+}
+
 (function() {
     'use strict';
     let base_url = 'https://tracker.tauguide.de/';
@@ -201,19 +257,22 @@ function extract_local_shuttles(options, station) {
     if (!station) {
         return;
     }
-
-    if (window.location.pathname.match('^/career')) {
+    let path = window.location.pathname;
+    if (path.match('^/career')) {
         record_career_tasks(options, station);
     }
     else {
-        let url = base_url + 'v1/career-task/station-needs-update/' + encodeURIComponent(station.system) + '/' + encodeURIComponent(station.name);
+        let url = options.base_url + 'v1/career-task/station-needs-update/' + encodeURIComponent(station.system) + '/' + encodeURIComponent(station.name);
         $.get(url, function (response) {
             if (response.needs_update) {
                 $('span.employment-title:contains(Career)').parent().append('– <a href="/career">Check tasks</a>');
             }
         });
     }
-    if (window.location.pathname.match('^/area/local-shuttles')) {
+    if (path.match('^/area/local-shuttles')) {
         extract_local_shuttles(options, station);
+    }
+    else if (path.match('^/area/docks')) {
+        extract_docks(options, station);
     }
 }());
