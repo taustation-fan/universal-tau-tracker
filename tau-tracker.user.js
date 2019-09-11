@@ -253,8 +253,7 @@ function extract_local_shuttles(options, station) {
         data: JSON.stringify(payload),
         success: function(response) {
             if (response.recorded) {
-                let message = 'Station distances recorded. +1 brownie point!';
-                utt_add_message(message);
+                utt_add_message(response.message);
             }
             else {
                 utt_add_message('error station distances: ' + response.message, 'orange');

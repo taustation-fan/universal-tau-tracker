@@ -35,22 +35,30 @@ def add_distance():
 
     station = get_station(payload['system'], payload['source'])
     count = 0
+    new = 0
     for schedule in payload['schedules']:
         destination = get_station(payload['system'], schedule['destination'])
         pair = get_station_pair(station, destination)
         for (departure, distance) in schedule['distances']:
             departure = parse_utc(departure) or departure
             count += 1
-            sdr = StationDistanceReading(
-                station_pair=pair,
+            existing = StationDistanceReading.query.filter_by(
+                station_pair_id=pair.id,
                 distance_km=distance,
                 when=departure,
-                token=token,
-            )
-            db.session.add(sdr)
+            ).first()
+            if not existing:
+                new += 1
+                sdr = StationDistanceReading(
+                    station_pair=pair,
+                    distance_km=distance,
+                    when=departure,
+                    token=token,
+                )
+                db.session.add(sdr)
     db.session.commit()
-    print('Recorded {} distance pairs for {} by {}'.format(count, payload['source'], token.character.name))
-    return jsonify({'recorded': True, 'message': 'Success'})
+    print('Recorded {} distance pairs ({} new) for {} by {}'.format(count, new, payload['source'], token.character.name))
+    return jsonify({'recorded': True, 'message': 'Recorded {} distance pairs, of which {} were new. +1 brownie point'.format(count, new)})
 
 @app.route('/distance')
 def distance_overview():
