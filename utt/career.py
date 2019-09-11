@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from flask import request, jsonify, Response
 from sqlalchemy import func
@@ -15,6 +15,9 @@ from utt.model import db, \
                       CareerBatchSubmission, \
                       CareerTask, \
                       CareerTaskReading
+
+def now():
+    return datetime.now(timezone.utc)
 
 @app.route('/v1/career-task/add', methods=['POST'])
 def career_task_add():
@@ -77,7 +80,7 @@ def career_task_add():
     response['factor'] = factor
 
     # find factors for other stations in the system
-    date_limit = datetime.utcnow() - timedelta(hours=6)
+    date_limit = now() - timedelta(hours=6)
     stations = Station.query.filter_by(system_id=station.system_id)
     system_factors = {}
     for st in stations.all():
@@ -110,7 +113,7 @@ def summary():
         bs = CareerBatchSubmission.query.filter_by(station_id=station.id).filter(CareerBatchSubmission.factor != None).order_by(CareerBatchSubmission.when.desc()).first()
         if not bs:
             continue
-        if (datetime.utcnow() - bs.when).total_seconds() > 6 * 3600:
+        if (now() - bs.when).total_seconds() > 6 * 3600:
             continue
         factors[station.system.name][station.name] = bs.factor
 
@@ -145,7 +148,7 @@ def career_station_needs_update(system, station):
     if newest is None:
         result = True
     else:
-        delta = datetime.utcnow() - newest.when
+        delta = now() - newest.when
         result = delta.total_seconds() > 4 * 3600
 
     return jsonify({'needs_update': result})
