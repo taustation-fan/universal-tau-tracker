@@ -1,8 +1,9 @@
+import pytz
 import json
 from collections import defaultdict
 from datetime import datetime, timedelta
 
-from flask import request, jsonify, Response
+from flask import request, jsonify, Response, url_for, render_template
 from sqlalchemy import func
 
 from .app import app
@@ -50,3 +51,37 @@ def add_distance():
     db.session.commit()
     print('Recorded {} distance pairs for {} by {}'.format(count, payload['source'], token.character.name))
     return jsonify({'recorded': True, 'message': 'Success'})
+
+@app.route('/distance')
+def distance_overview():
+    station_pairs = defaultdict(dict)
+
+    for sp in StationPair.query.all():
+        station_pairs[sp.system.name][str(sp)] = {
+            'id': sp.id,
+            'count': len(sp.readings),
+            'url': url_for('distance_pair', id=sp.id),
+        }
+    if request.content_type == 'application/json':
+        return jsonify(station_pairs)
+    return render_template('distance_overview.html', systems=station_pairs)
+
+@app.route('/distance/pair/<id>')
+def distance_pair(id):
+    id = int(id)
+    readings = []
+    pair = StationPair.query.filter_by(id=id).one()
+    for r in StationDistanceReading.query.filter_by(station_pair_id=id).order_by(StationDistanceReading.when).all():
+        readings.append({'x': r.when.astimezone(pytz.UTC).strftime( "%Y-%m-%dT%H:%M:%SZ"), 'y': r.distance_km})
+
+    result = {
+        'station_a_name': pair.station_a.name,
+        'station_b_name': pair.station_b.name,
+        'system_name': pair.system.name,
+        'pair_string': str(pair),
+        'readings': readings,
+    }
+    if request.content_type == 'application/json':
+        return jsonify(result)
+    result['readings'] = json.dumps(result['readings'])
+    return render_template('distance_pair.html', **result)

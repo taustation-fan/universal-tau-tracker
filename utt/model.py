@@ -115,11 +115,14 @@ class StationPair(db.Model):
     __table_args__ = (
         db.UniqueConstraint('station_a_id', 'station_b_id'),
     )    
+    def __str__(self):
+        return '{} ↔ {}'.format(self.station_a.name, self.station_b.name)
+
 
 class StationDistanceReading(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     station_pair_id = db.Column(db.ForeignKey('station_pair.id'), nullable=False)
-    station_pair = db.relationship('StationPair')
+    station_pair = db.relationship('StationPair', backref='readings')
 
     distance_km = db.Column(db.Integer, nullable=False)
     when = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.utcnow)

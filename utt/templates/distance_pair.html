@@ -1,0 +1,60 @@
+<html>
+<head>
+<title>{{ pair_string }}</title>
+    <meta charset="utf-8">
+    <style>
+        path {
+          stroke-width: 2;
+          fill: none;
+        }
+        .axis path, .axis line {
+          fill: none;
+          stroke: grey;
+          stroke-width: 1;
+          shape-rendering: crispEdges;
+        }
+        .area {
+          fill: #F0F8FF;
+          stroke-width: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ pair_string }}</h1>
+
+    <canvas id="myChart" width="600" height="300"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+
+    <script>
+        var graph_data = {{ readings | safe }};
+        graph_data.forEach(function (elem, idx) {
+            elem.x = new Date(elem.x);
+        });
+
+        window.onload = function () {
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: '{{ pair_string }}',
+                        data: graph_data,
+                    }]
+                },
+                options: {
+                    scales: {
+                        xAxes: [{
+                            type: 'time',
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: false
+                            }
+                        }]
+                    }
+                }
+            })
+        };
+    </script>
+</body>
+</html>
