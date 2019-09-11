@@ -10,6 +10,109 @@
 // @grant        none
 // ==/UserScript==
 
+// UI code shamelessly stolen from tauhead_data_gatherer.user.js
+// with s/tauhead/utt/g
+
+var game_mobile_message_section;
+var game_mobile_message_list;
+var game_desktop_message_section;
+var game_desktop_message_list;
+var game_character_message_items;
+var utt_init_message_ui_done;
+
+
+function utt_add_message(message, color) {
+    if (!utt_init_message_ui_done) {
+        utt_init_message_ui();
+    }
+
+    if (!color) {
+        color = "green";
+    }
+
+    let message_shown = false;
+
+    if ( game_mobile_message_list.length === 1 ) {
+        game_mobile_message_list.append(
+            "<li style='background-color: "+color+";'>" +
+            "Tau Tracker: " +
+            message +
+            "</li>"
+        );
+        message_shown = true;
+    }
+
+    if ( game_desktop_message_list.length === 1 ) {
+        game_desktop_message_list.append(
+            "<li style='background-color: "+color+";'>" +
+            "Tau Tracker: " +
+            message +
+            "</li>"
+        );
+        message_shown = true;
+    }
+
+    if ( !message_shown ) {
+        $(th_message).append(
+            "<div style='background-color: "+color+";'>" +
+            message +
+            "</div>"
+        );
+    }
+}
+
+function utt_populate_mobile_message_vars() {
+    game_mobile_message_section = $("#main-content > section[aria-label='Feedback']").first();
+    game_mobile_message_list    = $(game_mobile_message_section).find("ul#character-messages").first();
+}
+
+function utt_populate_desktop_message_vars() {
+    game_desktop_message_section = $("#main-content > .content-section > section[aria-label='Action Feedback']").first();
+    game_desktop_message_list    = $(game_desktop_message_section).find("ul.character-messages-desktop").first();
+}
+
+function utt_init_message_ui() {
+    if (utt_init_message_ui_done) {
+        return;
+    }
+
+    if (!game_mobile_message_section) {
+        utt_populate_mobile_message_vars();
+    }
+
+    if (!game_desktop_message_section) {
+        utt_populate_desktop_message_vars();
+    }
+
+    if ( game_mobile_message_section.length === 0 ) {
+        utt_init_button_ui();
+        utt_init_message_ui_done = true;
+        return;
+    }
+
+    if ( game_desktop_message_section.length === 0 ) {
+        game_desktop_message_section = game_mobile_message_section;
+    }
+
+    if ( !game_mobile_message_list || game_mobile_message_list.length === 0 ) {
+        game_mobile_message_list = $("<ul id='character-messages' class='messages character-messages-mobile' role='alert' area-label='Action Feedback'></ul>");
+        game_mobile_message_section.append(game_mobile_message_list);
+    }
+
+    // If we're re-using the mobile section for the desktop,
+    // don't add the message twice
+    if ( !game_mobile_message_section.is( game_desktop_message_section ) ) {
+        if ( !game_desktop_message_list || game_desktop_message_list.length === 0 ) {
+            game_desktop_message_list = $("<ul class='messages character-messages-desktop' role='alert' area-label='Action Feedback'></ul>");
+            game_desktop_message_section.append(game_desktop_message_list);
+        }
+    }
+
+    utt_init_message_ui_done = true;
+}
+// end stuff stolen from tauhead
+
+
 function get_station() {
     var full_station = $('span.station').text().trim();
     var match = full_station.match(/([^,]+), (.*?)\s+system/);
@@ -19,10 +122,6 @@ function get_station() {
             system: match[2],
         }
     }
-}
-function status_message(message) {
-    $('p#ctt_msg').remove();
-    $('div.career-task-container').after('<p id="ctt_msg">Career task tracker: ' + message + '</p>')
 }
 
 function format_float(f) {
@@ -36,12 +135,12 @@ function format_float(f) {
 function record_career_tasks(options, station) {
     var token = options.token;
     if (!token) {
-        status_message('Please configure your access token in the user preferences');
+        utt_add_message('Please configure your access token in the user preferences', 'orange');
         return;
     }
 
     if ($('#employment-nav-heading').length == 0) {
-        status_message('Cannot extract all necessary data while the "Current Ventures" box is missing');
+        utt_add_message('Cannot extract all necessary data while the "Current Ventures" box is missing', 'orange')
         return;
     }
     var career_chunks = $('div#employment_panel').find('li:Contains("Career")').find('a').text().trim().split(' - ');
@@ -59,7 +158,7 @@ function record_career_tasks(options, station) {
         });
     });
     if ($.isEmptyObject(tasks)) {
-        status_message('No career tasks found');
+        utt_add_message('No career tasks found', 'orange')
         return;
     }
 
@@ -104,14 +203,14 @@ function record_career_tasks(options, station) {
                 else {
                     message += 'No data from other stations in this system is available right now.';
                 }
-                status_message(message);
+                utt_add_message(message);
             }
             else {
-                status_message('error recording tasks: ' + response.message);
+                utt_add_message('error recording tasks: ' + response.message, 'orange');
             }
         },
         error: function(xhr) {
-            status_message('cannot talk to ' + url + ': ' + xhr.response_text);
+            utt_add_message('cannot talk to ' + url + ': ' + xhr.response_text, 'orange');
         },
     });
 }
@@ -119,7 +218,7 @@ function record_career_tasks(options, station) {
 function extract_local_shuttles(options, station) {
     var token = options.token;
     if (!token) {
-        status_message('Please configure your access token in the user preferences');
+        utt_add_message('Please configure your access token in the user preferences', 'orange');
         return;
     }
 
@@ -155,14 +254,14 @@ function extract_local_shuttles(options, station) {
         success: function(response) {
             if (response.recorded) {
                 let message = 'Station distances recorded. +1 brownie point!';
-                status_message(message);
+                utt_add_message(message);
             }
             else {
-                status_message('error station distances: ' + response.message);
+                utt_add_message('error station distances: ' + response.message, 'orange');
             }
         },
         error: function(xhr) {
-            status_message('cannot talk to ' + url + ': ' + xhr.response_text);
+            utt_add_message('cannot talk to ' + url + ': ' + xhr.response_text, 'orange');
         },
     });
 }
@@ -173,7 +272,7 @@ function extract_docks(options, station) {
     }
     var token = options.token;
     if (!token) {
-        status_message('Please configure your access token in the user preferences');
+        utt_add_message('Please configure your access token in the user preferences', 'orange');
         return;
     }
     var departure = $('html').data('time');
@@ -211,14 +310,14 @@ function extract_docks(options, station) {
         success: function(response) {
             if (response.recorded) {
                 let message = 'Station distances recorded. +1 brownie point!';
-                status_message(message);
+                ttu_add_message(message);
             }
             else {
-                status_message('error station distances: ' + response.message);
+                ttu_add_message('error station distances: ' + response.message, 'orange');
             }
         },
         error: function(xhr) {
-            status_message('cannot talk to ' + url + ': ' + xhr.response_text);
+            ttu_add_message('cannot talk to ' + url + ': ' + xhr.response_text, 'orange');
         },
     });
 }
