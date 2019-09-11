@@ -3,19 +3,8 @@
 <title>{{ pair_string }}</title>
     <meta charset="utf-8">
     <style>
-        path {
-          stroke-width: 2;
-          fill: none;
-        }
-        .axis path, .axis line {
-          fill: none;
-          stroke: grey;
-          stroke-width: 1;
-          shape-rendering: crispEdges;
-        }
-        .area {
-          fill: #F0F8FF;
-          stroke-width: 0;
+        canvas {
+            margin: 2ex;
         }
     </style>
 </head>
@@ -24,6 +13,8 @@
 
     <canvas id="myChart" width="600" height="300"></canvas>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.3"></script>
 
     <script>
         var graph_data = {{ readings | safe }};
@@ -42,6 +33,15 @@
                     }]
                 },
                 options: {
+                    plugins: {
+                        zoom: {
+                            pan: {
+                                enabled: true,
+                                mode: 'x',
+                                drag: true,
+                            },
+                        },
+                    },
                     scales: {
                         xAxes: [{
                             type: 'time',
