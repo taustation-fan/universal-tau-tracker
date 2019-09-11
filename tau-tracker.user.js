@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Tau Station Universal Tracker
-// @version      0.2
+// @version      0.3
 // @author       Moritz Lenz <moritz.lenz@gmail.com>
 // @description  General data collection script for Tau Station. Please get an access token from moritz and add it in your preferences page.
 // @match        https://alpha.taustation.space/
@@ -356,18 +356,18 @@ function extract_docks(options, station) {
         return;
     }
     let path = window.location.pathname;
-    if (path.match('^/career')) {
-        record_career_tasks(options, station);
-    }
-    else {
-        let url = options.base_url + 'v1/career-task/station-needs-update/' + encodeURIComponent(station.system) + '/' + encodeURIComponent(station.name);
+    (function() {
+        let url = options.base_url + 'v1/career-task/station-needs-update/' + encodeURIComponent(station.system) + '/' + encodeURIComponent(station.station);
         $.get(url, function (response) {
             if (response.needs_update) {
                 $('span.employment-title:contains(Career)').parent().append('– <a href="/career">Check tasks</a>');
             }
         });
-    }
-    if (path.match('^/area/local-shuttles')) {
+    })()
+
+    if (path.match('^/career')) {
+        record_career_tasks(options, station);
+    } else if (path.match('^/area/local-shuttles')) {
         extract_local_shuttles(options, station);
     }
     else if (path.match('^/area/docks')) {
