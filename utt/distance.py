@@ -40,6 +40,9 @@ def add_distance():
         destination = get_station(payload['system'], schedule['destination'])
         pair = get_station_pair(station, destination)
         for (departure, distance) in schedule['distances']:
+            if not isinstance(distance, (int, float)):
+                continue
+            distance = int(distance)
             departure = parse_utc(departure) or departure
             count += 1
             existing = StationDistanceReading.query.filter_by(

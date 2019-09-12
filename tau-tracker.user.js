@@ -230,14 +230,19 @@ function extract_local_shuttles(options, station) {
         let distances = [];
         $table.find('li.ticket-schedule-row').each(function() {
             let $row = $(this);
-            let distance = $row.find('.ticket-col-distance').find('dd').text().replace(/\s*km/, '');
+            let distance = parseInt($row.find('.ticket-col-distance').find('dd').text().replace(/\s*km/, ''), 10);
             let departure = $row.find('.ticket-col-departure').find('dd').text();
-            if (distance.length) {
-                distances.push([departure, parseInt(distance, 10)]);
+            if (distance && departure) {
+                distances.push([departure, distance]);
             }
         });
-        schedules.push({'destination': destination, 'distances': distances});
+        if (distances.length) {
+            schedules.push({'destination': destination, 'distances': distances});
+        }
     })
+    if (schedules.length == 0) {
+        return;
+    }
     var payload = {
         token: token,
         source: station.station,
@@ -288,8 +293,13 @@ function extract_docks(options, station) {
                 distances.push([departure, distance]);
             }
         });
-        schedules.push({'destination': destination, 'distances': distances});
+        if (distances.length) {
+            schedules.push({'destination': destination, 'distances': distances});
+        }
     });
+    if (schedules.length == 0) {
+        return;
+    }
     var payload = {
         token: token,
         source: station.station,
