@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Tau Station Universal Tracker
-// @version      0.5
+// @version      0.6
 // @author       Moritz Lenz <moritz.lenz@gmail.com>
 // @description  General data collection script for Tau Station. Please get an access token from moritz and add it in your preferences page.
 // @match        https://alpha.taustation.space/
@@ -232,8 +232,9 @@ function extract_local_shuttles(options, station) {
             let $row = $(this);
             let distance = parseInt($row.find('.ticket-col-distance').find('dd').text().replace(/\s*km/, ''), 10);
             let departure = $row.find('.ticket-col-departure').find('dd').text();
+            let travel_time = $row.find('.ticket-col-travel-time').eq(1).find('dd').text()
             if (distance && departure) {
-                distances.push([departure, distance]);
+                distances.push([departure, distance, travel_time]);
             }
         });
         if (distances.length) {
@@ -335,7 +336,7 @@ function extract_docks(options, station) {
     function pref_specs() {
         return {
             key: 'career_tracker',
-            label: 'Career Task Tracker',
+            label: 'Universal Tau Tracker',
             options: [
                 {
                     key: 'token',
