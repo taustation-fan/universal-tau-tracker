@@ -12,6 +12,8 @@
 <body>
     <h1>{{ pair_string }}</h1>
 
+    <p><a href="{{ url_for('distance_overview') }}">Back to station distances overview.</a></p>
+
     <canvas id="myChart" width="600" height="300"></canvas>
 
     {% if max_distance%}
