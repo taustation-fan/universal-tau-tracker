@@ -1,8 +1,8 @@
 <html>
-{% for system_name, pairs in systems.items() %}
+{% for system_name, pairs in systems.items()|sort(attribute='0') %}
 <h2>{{ system_name }}</h2>
 <ul>
-    {% for name, pair in pairs.items(): %}
+    {% for name, pair in pairs.items()|sort(attribute='0'): %}
         <li><a href="{{ pair.url }}">{{ name }}</a> ({{pair.count}} readings)</li>
     {% endfor %}
 </ul>
