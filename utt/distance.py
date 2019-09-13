@@ -8,7 +8,7 @@ from sqlalchemy import func
 
 from .app import app
 
-from utt.gct import parse_utc
+from utt.gct import parse_gct
 from utt.model import db, \
                       get_station, \
                       get_station_pair, \
@@ -43,7 +43,7 @@ def add_distance():
             if not isinstance(distance, (int, float)):
                 continue
             distance = int(distance)
-            departure = parse_utc(departure) or departure
+            departure = parse_gct(departure) or departure
             count += 1
             existing = StationDistanceReading.query.filter_by(
                 station_pair_id=pair.id,
