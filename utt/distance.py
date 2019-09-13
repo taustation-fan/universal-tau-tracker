@@ -86,6 +86,7 @@ def distance_pair(id):
         readings.append({'x': r.when.astimezone(pytz.UTC).strftime( "%Y-%m-%dT%H:%M:%SZ"), 'y': r.distance_km})
 
     result = {
+        'id': id,
         'station_a_name': pair.station_a.name,
         'station_b_name': pair.station_b.name,
         'system_name': pair.system.name,

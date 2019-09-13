@@ -5,6 +5,7 @@
     <style>
         canvas {
             margin: 2ex;
+            padding: 2ex;
         }
     </style>
 </head>
@@ -12,6 +13,9 @@
     <h1>{{ pair_string }}</h1>
 
     <canvas id="myChart" width="600" height="300"></canvas>
+
+    <p><a href="{{ url_for('distance_pair_csv', id=id) }}">Download as CSV.</a></p>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.3"></script>
