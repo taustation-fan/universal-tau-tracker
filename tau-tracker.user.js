@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Tau Station Universal Tracker
-// @version      0.6
+// @version      0.7
 // @author       Moritz Lenz <moritz.lenz@gmail.com>
 // @description  General data collection script for Tau Station. Please get an access token from moritz and add it in your preferences page.
 // @match        https://alpha.taustation.space/
@@ -232,7 +232,7 @@ function extract_local_shuttles(options, station) {
             let $row = $(this);
             let distance = parseInt($row.find('.ticket-col-distance').find('dd').text().replace(/\s*km/, ''), 10);
             let departure = $row.find('.ticket-col-departure').find('dd').text();
-            let travel_time = $row.find('.ticket-col-travel-time').eq(1).find('dd').text()
+            let travel_time = $row.find('.ticket-col-travel-time').find('dd').text()
             if (distance && departure) {
                 distances.push([departure, distance, travel_time]);
             }

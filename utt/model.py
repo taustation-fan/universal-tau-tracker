@@ -126,6 +126,7 @@ class StationDistanceReading(db.Model):
 
     distance_km = db.Column(db.Integer, nullable=False)
     when = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.utcnow)
+    travel_time_u = db.Column(db.Integer, nullable=True) # travel time in units
 
     token_id = db.Column(db.ForeignKey('token.id'), nullable=False)
     token = db.relationship('Token')

@@ -1,5 +1,6 @@
 import pytz
 import json
+import re
 from collections import defaultdict
 from datetime import datetime, timedelta
 
@@ -57,10 +58,15 @@ def add_distance():
             ).first()
             if not existing:
                 new += 1
+                if travel_time and re.match('[0-9]', travel_time):
+                    travel_time = int(re.sub(r'[^0-9]', '', travel_time))
+                else:
+                    travel_time = None
                 sdr = StationDistanceReading(
                     station_pair=pair,
                     distance_km=distance,
                     when=departure,
+                    travel_time_u=travel_time,
                     token=token,
                 )
                 db.session.add(sdr)
