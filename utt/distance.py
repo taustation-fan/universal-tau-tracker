@@ -8,7 +8,7 @@ from sqlalchemy import func
 
 from .app import app
 
-from utt.gct import parse_gct
+from utt.gct import as_gct, parse_gct
 from utt.model import db, \
                       get_station, \
                       get_station_pair, \
@@ -96,3 +96,19 @@ def distance_pair(id):
         return jsonify(result)
     result['readings'] = json.dumps(result['readings'])
     return render_template('distance_pair.html', **result)
+
+@app.route('/distance/pair/<id>.csv')
+def distance_pair_csv(id):
+    id = int(id)
+    pair = StationPair.query.filter_by(id=id).one()
+    rows = ["Time/UTC,Time/GCT,Distance/km\n"]
+    for r in StationDistanceReading.query.filter_by(station_pair_id=id).order_by(StationDistanceReading.when).all():
+        when = r.when.astimezone(pytz.UTC)
+        rows.append('{},{},{}\n'.format(
+            when.strftime( "%Y-%m-%dT%H:%M:%SZ"),
+            as_gct(when),
+            r.distance_km,
+        ))
+    response = Response(''.join(rows), mimetype='text/csv')
+    response.headers['Content-Disposition'] = 'attachment; filename=pair-{}.csv'.format(id)
+    return response
