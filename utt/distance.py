@@ -81,9 +81,16 @@ def distance_overview():
 def distance_pair(id):
     id = int(id)
     readings = []
+    sdr_m = StationDistanceReading
     pair = StationPair.query.filter_by(id=id).one()
-    for r in StationDistanceReading.query.filter_by(station_pair_id=id).order_by(StationDistanceReading.when).all():
+    for r in sdr_m.query.filter_by(station_pair_id=id).order_by(StationDistanceReading.when).all():
         readings.append({'x': r.when.astimezone(pytz.UTC).strftime( "%Y-%m-%dT%H:%M:%SZ"), 'y': r.distance_km})
+
+    min_distance, max_distance = None, None
+    if r:
+        min_distance, max_distance = db.session.query(func.min(sdr_m.distance_km),
+                                                      func.max(sdr_m.distance_km)) \
+                                        .filter(sdr_m.station_pair_id == id).first()
 
     result = {
         'id': id,
@@ -92,6 +99,8 @@ def distance_pair(id):
         'system_name': pair.system.name,
         'pair_string': str(pair),
         'readings': readings,
+        'min_distance': min_distance,
+        'max_distance': max_distance,
     }
     if request.content_type == 'application/json':
         return jsonify(result)

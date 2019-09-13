@@ -14,6 +14,10 @@
 
     <canvas id="myChart" width="600" height="300"></canvas>
 
+    {% if max_distance%}
+    <p>The recorded distances vary between {{ min_distance }} and {{ max_distance }} km.</p>
+    {% endif %}
+
     <p><a href="{{ url_for('distance_pair_csv', id=id) }}">Download as CSV.</a></p>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
