@@ -58,7 +58,7 @@ def add_distance():
             ).first()
             if not existing:
                 new += 1
-                if travel_time and re.match('[0-9]', travel_time):
+                if travel_time and re.search('[0-9]', travel_time):
                     travel_time = int(re.sub(r'[^0-9]', '', travel_time))
                 else:
                     travel_time = None
