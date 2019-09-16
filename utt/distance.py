@@ -79,11 +79,13 @@ def distance_overview():
     station_pairs = defaultdict(dict)
 
     for sp in StationPair.query.all():
-        station_pairs[sp.system.name][str(sp)] = {
-            'id': sp.id,
-            'count': len(sp.readings),
-            'url': url_for('distance_pair', id=sp.id),
-        }
+        count = len(sp.readings)
+        if count > 0:
+            station_pairs[sp.system.name][str(sp)] = {
+                'id': sp.id,
+                'count': len(sp.readings),
+                'url': url_for('distance_pair', id=sp.id),
+            }
     if request.content_type == 'application/json':
         return jsonify(station_pairs)
     return render_template('distance_overview.html', systems=station_pairs)
