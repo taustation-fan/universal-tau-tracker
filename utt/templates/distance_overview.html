@@ -1,4 +1,10 @@
 <html>
+<head>
+    <title>Tau Station: Station Distance Recordings</title>
+</head>
+<p>With {{ total }} data points so far. <a href="https://github.com/taustation-fan/universal-tau-tracker#readme">Help collecting data through a simple userscript!</a></p>
+
+
 {% for system_name, pairs in systems.items()|sort(attribute='0') %}
 <h2>{{ system_name }}</h2>
 <ul>

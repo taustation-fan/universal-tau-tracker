@@ -78,9 +78,11 @@ def add_distance():
 def distance_overview():
     station_pairs = defaultdict(dict)
 
+    total_count = 0;
     for sp in StationPair.query.all():
         count = len(sp.readings)
         if count > 0:
+            total_count += count
             station_pairs[sp.system.name][str(sp)] = {
                 'id': sp.id,
                 'count': len(sp.readings),
@@ -88,7 +90,7 @@ def distance_overview():
             }
     if request.content_type == 'application/json':
         return jsonify(station_pairs)
-    return render_template('distance_overview.html', systems=station_pairs)
+    return render_template('distance_overview.html', systems=station_pairs, total=total_count)
 
 @app.route('/distance/pair/<id>')
 def distance_pair(id):
