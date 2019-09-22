@@ -23,7 +23,7 @@
     <p><a href="{{ url_for('distance_pair_csv', id=id) }}">Download as CSV.</a></p>
 
     {% if has_prediction %}
-    <h2>Distance predictions for the next day</h2>
+    <h2 id="prediction">Distance predictions for the next day</h2>
     <img src="{{ url_for('distance_pair_prediction_png', id=id) }}"></img>
 
     {% endif %}
