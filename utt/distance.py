@@ -2,9 +2,15 @@ import pytz
 import json
 import re
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from io import BytesIO
 
-from flask import request, jsonify, Response, url_for, render_template
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+from flask import request, jsonify, Response, url_for, render_template, send_file
 from sqlalchemy import func
 
 from .app import app
@@ -116,6 +122,7 @@ def distance_pair(id):
         'readings': readings,
         'min_distance': min_distance,
         'max_distance': max_distance,
+        'has_prediction': pair.has_full_fit,
     }
     if request.content_type == 'application/json':
         return jsonify(result)
@@ -137,3 +144,45 @@ def distance_pair_csv(id):
     response = Response(''.join(rows), mimetype='text/csv')
     response.headers['Content-Disposition'] = 'attachment; filename=pair-{}.csv'.format(id)
     return response
+
+
+@app.route('/distance/pair/<id>/prediction_png')
+def distance_pair_prediction_png(id):
+    pair_id = int(id)
+    pair = StationPair.query.filter_by(id=pair_id).one()
+    assert pair.fit_period_u is not None, 'No period fit known'
+    assert pair.fit_min_distance_km is not None, 'No min distance fit known'
+    assert pair.fit_max_distance_km is not None, 'No max distance fit known'
+    assert pair.fit_phase is not None, 'No phase fit known'
+
+    start = datetime.now(timezone.utc)
+    end  = start + timedelta(days=1)
+    SDR = StationDistanceReading
+    readings = SDR.query.filter_by(station_pair_id=pair.id)\
+               .filter(SDR.when >=start, SDR.when < end).order_by(SDR.when)
+    x = []
+    y = []
+    for reading in readings:
+        x.append(float(as_gct(reading.when, format=False)))
+        y.append(float(reading.distance_km))
+
+    xr = np.linspace(float(as_gct(start, format=False)), float(as_gct(end, format=False)), 1000)
+
+    maxs = pair.fit_max_distance_km ** 2
+    mins = pair.fit_min_distance_km ** 2
+
+    baseline =(maxs + mins) / 2
+    amplitude = (maxs - mins) / 2
+    yr = np.sqrt(baseline +  amplitude * np.cos(xr * (2 * np.pi / pair.fit_period_u) + pair.fit_phase))
+
+    plt.plot(xr, yr, 'b-', label='predicted values')
+
+    if len(x) > 2:
+        plt.plot(x, y, 'ro', label='Measurement')
+    # plt.gcf().set_size_inches(12, 9)
+    plt.title(str(pair))
+    plt.legend()
+    img = BytesIO()
+    plt.savefig(img)
+    img.seek(0)
+    return send_file(img, mimetype='image/png')
