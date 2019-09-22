@@ -13,7 +13,9 @@ with open(filename) as f:
 
 with app.app_context():
     for record in data:
-        pair = StationPair.query.filter_by(id=record.pop('id'))
+        pair = StationPair.query.filter_by(id=record.pop('id')).first()
+        if not pair:
+            continue
         for k, v in record.items():
             setattr(pair, k, v)
     db.session.commit()
