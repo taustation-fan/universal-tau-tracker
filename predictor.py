@@ -46,7 +46,10 @@ with app.app_context():
     if len(x) > 2:
         plt.plot(x, y, 'ro', label='Measurement')
     plt.gcf().set_size_inches(12, 9)
+    plt.ylabel('Distance/km')
+    plt.xlabel('Time/u')
     plt.title(str(pair))
     plt.legend()
+    plt.tight_layout()
     plt.show()
 
