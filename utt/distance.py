@@ -175,6 +175,8 @@ def distance_pair_prediction_png(id):
     amplitude = (maxs - mins) / 2
     yr = np.sqrt(baseline +  amplitude * np.cos(xr * (2 * np.pi / pair.fit_period_u) + pair.fit_phase))
 
+    plt.clf()
+    plt.cla()
     plt.plot(xr, yr, 'b-', label='predicted values')
 
     if len(x) > 2:

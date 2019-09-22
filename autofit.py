@@ -29,6 +29,8 @@ with app.app_context():
     max_y = max(y)
     baseline = (min_y + max_y) / 2
     amplitude = (max_y - min_y) / 2
+    if pair.fit_min_distance_km is not None and pair.fit_max_distance_km is not None:
+        baseline, amplitude = pair.baseline_amptlitude_pair
 
     if pair.fit_period_u:
         period = pair.fit_period_u

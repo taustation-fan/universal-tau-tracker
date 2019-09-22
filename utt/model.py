@@ -131,6 +131,17 @@ class StationPair(db.Model):
            and self.fit_max_distance_km is not None \
            and self.fit_phase           is not None
 
+    @property
+    def baseline_amptlitude_pair(self):
+        if self.fit_max_distance_km is None or self.fit_min_distance_km is None:
+            return None, None
+        maxs = self.fit_max_distance_km ** 2
+        mins = self.fit_min_distance_km ** 2
+
+        baseline = (maxs + mins) / 2
+        amplitude = (maxs - mins) / 2
+        return baseline, amplitude
+
 
 class StationDistanceReading(db.Model):
     id = db.Column(db.Integer, primary_key=True)
