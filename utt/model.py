@@ -112,11 +112,24 @@ class StationPair(db.Model):
     station_b_id = db.Column(db.ForeignKey('station.id'), nullable=False)
     station_b = db.relationship('Station', foreign_keys=[station_b_id])
 
+    # fitted parameters of this station pair
+    fit_period_u = db.Column(db.Float)
+    fit_min_distance_km = db.Column(db.Float)
+    fit_max_distance_km = db.Column(db.Float)
+    fit_phase = db.Column(db.Float)
+
     __table_args__ = (
         db.UniqueConstraint('station_a_id', 'station_b_id'),
     )    
     def __str__(self):
         return '{} ↔ {}'.format(self.station_a.name, self.station_b.name)
+
+    @property
+    def has_full_fit(self):
+        return self.fit_period_u        is not None \
+           and self.fit_min_distance_km is not None \
+           and self.fit_max_distance_km is not None \
+           and self.fit_phase           is not None
 
 
 class StationDistanceReading(db.Model):

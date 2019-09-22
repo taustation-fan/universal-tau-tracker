@@ -12,9 +12,11 @@ def parse_gct(in_):
         seconds = int(match.group(2).replace(':', '')) * 0.864
         return catastrophe + timedelta(days=days, seconds=seconds)
 
-def as_gct(dt):
+def as_gct(dt, format=True):
     delta = dt - catastrophe
     total_units = str(int(delta.total_seconds() / 0.864 + 0.5))
+    if not format:
+        return total_units
     return total_units[:-7] + '.' + total_units[-7:-5] \
                            + '/' + total_units[-5:-3] \
                            + ':' + total_units[-3:]
