@@ -6,7 +6,7 @@ from sqlalchemy.sql import func
 db = SQLAlchemy()
 
 def get_station(system_name, station_name, create=True):
-    system = System.query.filter_by(name=system_name).first()
+    system = System.query.filter(func.lower(System.name)==system_name.lower()).first()
     if not system:
         assert create, 'No such system {}'.format(system_name)
         system = System(name=system_name)
