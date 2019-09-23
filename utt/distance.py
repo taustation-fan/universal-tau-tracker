@@ -44,6 +44,8 @@ def add_distance():
     count = 0
     new = 0
     for schedule in payload['schedules']:
+        if not schedule['distances']:
+            continue
         destination = get_station(payload['system'], schedule['destination'])
         pair = get_station_pair(station, destination)
         for d_tuple  in schedule['distances']:
