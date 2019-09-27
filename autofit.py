@@ -55,6 +55,8 @@ with app.app_context():
 
     # prepare for least-squares curve fit
     def f(x, period, amplitude, baseline, phase):
+        if amplitude > baseline:
+            return 1e20
         return np.cos(np.array(x) * (2 * np.pi / period) + phase) * amplitude + baseline
 
     initial = [period, amplitude, baseline, phase]

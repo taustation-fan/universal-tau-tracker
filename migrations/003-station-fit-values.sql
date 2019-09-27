@@ -1,0 +1,3 @@
+ALTER TABLE station
+    ADD COLUMN fit_period_u DOUBLE PRECISION,
+    ADD COLUMN fit_radius_km DOUBLE PRECISION;
