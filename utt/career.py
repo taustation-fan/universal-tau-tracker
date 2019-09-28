@@ -162,7 +162,7 @@ def system_career_graph(id):
     datasets = []
     CBS = CareerBatchSubmission
     # colors from https://htmlcolorcodes.com/color-chart/
-    colors = '#cd6155 #9b59b6 #2980b9 #1abc9c #16a085 #f1c40f #f39c12 #d35400 #7f8c8d'.split(' ')
+    colors = '#cd6155 #9b59b6 #2980b9 #1abc9c #16a085 #f1c40f #f39c12 #7f8c8d #f1948a #85c1e9'.split(' ')
     for idx, station in enumerate(stations):
         data = []
         q = CBS.query.filter(CBS.station_id == station.id, CBS.when <= limit).order_by(CBS.when)
