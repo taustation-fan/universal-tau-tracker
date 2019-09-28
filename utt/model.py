@@ -29,7 +29,7 @@ class System(db.Model):
 class Station(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     system_id = db.Column(db.ForeignKey('system.id'), nullable=False)
-    system = db.relationship('System')
+    system = db.relationship('System', backref='stations')
     name = db.Column(db.String(200), unique=True, nullable=False)
     name_lower = db.Column(db.String(200), unique=True, nullable=False)
     fit_radius_km = db.Column(db.Float)

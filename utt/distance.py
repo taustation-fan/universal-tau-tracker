@@ -96,6 +96,7 @@ def distance_overview():
                 'id': sp.id,
                 'count': len(sp.readings),
                 'url': url_for('distance_pair', id=sp.id),
+                'has_fit': sp.has_full_fit,
             }
     if request.content_type == 'application/json':
         return jsonify(station_pairs)

@@ -4,12 +4,15 @@
 </head>
 <p>With {{ total }} data points so far. <a href="https://github.com/taustation-fan/universal-tau-tracker#readme">Help collecting data through a simple userscript!</a></p>
 
+<p>🗹 : Orbital parameters and predicitons available</br>
+☐ : Orbital parameters missing, please help collect more data!</p>
 
 {% for system_name, pairs in systems.items()|sort(attribute='0') %}
 <h2>{{ system_name }}</h2>
 <ul>
     {% for name, pair in pairs.items()|sort(attribute='0'): %}
-        <li><a href="{{ pair.url }}">{{ name }}</a> ({{pair.count}} readings)</li>
+        <li>{% if pair.has_fit %}🗹{% else %}☐{% endif %} <a href="{{ pair.url }}">{{ name }}</a> ({{pair.count}} readings)</li>
+
     {% endfor %}
 </ul>
 {% endfor %}
