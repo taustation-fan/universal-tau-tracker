@@ -1,0 +1,61 @@
+<html>
+<head>
+<title>{{ system.name }} Career Factors</title>
+    <meta charset="utf-8">
+    <style>
+        canvas {
+            margin: 2ex;
+            padding: 2ex;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ system.name }} Career Factors</h1>
+
+    <canvas id="myChart" width="600" height="300"></canvas>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.3"></script>
+
+    <script>
+        var datasets = {{ datasets | safe }};
+        datasets.forEach(function (dataset, idx) {
+            dataset.data.forEach(function (elem, idx) {
+                elem.x = new Date(elem.x);
+            });
+        });
+
+        window.onload = function () {
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: datasets
+                },
+                options: {
+                    plugins: {
+                        zoom: {
+                            pan: {
+                                enabled: true,
+                                mode: 'x',
+                                drag: true,
+                            },
+                        },
+                    },
+                    scales: {
+                        xAxes: [{
+                            type: 'time',
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: false
+                            }
+                        }]
+                    }
+                }
+            })
+        };
+    </script>
+</body>
+</html>

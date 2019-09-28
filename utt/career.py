@@ -1,7 +1,8 @@
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
+import json
 
-from flask import request, jsonify, Response
+from flask import request, jsonify, Response, render_template
 from sqlalchemy import func
 
 from .app import app
@@ -152,3 +153,30 @@ def career_station_needs_update(system, station):
         result = delta.total_seconds() > 4 * 3600
 
     return jsonify({'needs_update': result})
+
+@app.route('/system/<id>/career')
+def system_career_graph(id):
+    system = System.query.filter_by(id=id).one()
+    stations = system.stations
+    limit = now() - timedelta(days=1)
+    datasets = []
+    CBS = CareerBatchSubmission
+    # colors from https://htmlcolorcodes.com/color-chart/
+    colors = '#cd6155 #9b59b6 #2980b9 #1abc9c #16a085 #f1c40f #f39c12 #d35400 #7f8c8d'.split(' ')
+    for idx, station in enumerate(stations):
+        data = []
+        q = CBS.query.filter(CBS.station_id == station.id, CBS.when <= limit).order_by(CBS.when)
+        for batch in q:
+            if batch.factor:
+                data.append({'x': batch.when.strftime( "%Y-%m-%dT%H:%M:%SZ"), 'y': batch.factor})
+        if data:
+            datasets.append({
+                'label': station.name,
+                'data': data,
+                'backgroundColor': colors[idx],
+            })
+    ctx = {
+        'system': system,
+        'datasets': json.dumps(datasets),
+    }
+    return render_template('system_career_factor.html', **ctx)
