@@ -144,6 +144,10 @@ class StationPair(db.Model):
         amplitude = (maxs - mins) / 2
         return baseline, amplitude
 
+    @property
+    def readings_count(self):
+        return StationDistanceReading.query.filter_by(station_pair_id=self.id).count()
+
 
 class StationDistanceReading(db.Model):
     id = db.Column(db.Integer, primary_key=True)

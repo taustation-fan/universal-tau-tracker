@@ -89,12 +89,12 @@ def distance_overview():
 
     total_count = 0;
     for sp in StationPair.query.all():
-        count = len(sp.readings)
+        count = sp.readings_count
         if count > 0:
             total_count += count
             station_pairs[sp.system.name][str(sp)] = {
                 'id': sp.id,
-                'count': len(sp.readings),
+                'count': count,
                 'url': url_for('distance_pair', id=sp.id),
                 'has_fit': sp.has_full_fit,
             }
