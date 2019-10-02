@@ -45,7 +45,6 @@ def find_similar_numbers(l):
 with app.app_context():
     system = System.query.filter_by(id=system_id).one()
     pairs = StationPair.query.filter(StationPair.system_id == system.id, StationPair.fit_period_u != None)
-    radius_by_pair_id = dict()
     by_station_id = defaultdict(list)
     relative_period = defaultdict(dict)
     station_by_id = dict()
@@ -55,7 +54,6 @@ with app.app_context():
     for pair in pairs:
         radii = [(pair.fit_max_distance_km - pair.fit_min_distance_km) / 2,
                  (pair.fit_max_distance_km + pair.fit_min_distance_km) / 2]
-        radius_by_pair_id[pair.id] = radii
         station_by_id[pair.station_a_id] = pair.station_a
         station_by_id[pair.station_b_id] = pair.station_b
         by_station_id[pair.station_a_id] += radii
@@ -69,7 +67,7 @@ with app.app_context():
         std = np.std(similar)
         radius_by_id[station_id] = (avg, std)
 
-    station_ids = sorted(station_by_id.keys(), key=lambda x: radius_by_id[x])
+    station_ids = sorted(station_by_id.keys(), key=lambda x: radius_by_id[x][0])
     all_periods = [pair.fit_period_u for pair in pairs]
     initial = np.linspace(np.min(all_periods), np.max(all_periods), len(station_ids))
     # initial = [752e3, 1184e3, 2308e3, 4197e3]
@@ -83,14 +81,18 @@ with app.app_context():
                 except KeyError:
                     continue
                 result.append( 1 / (1/times[i] - 1/times[j]) - t)
+                result.append( 1e6 * (
+                    times[i] ** 2 / radius_by_id[station_ids[i]][0] ** 3 \
+                  - times[j] ** 2 / radius_by_id[station_ids[j]][0] ** 3
+                ))
         return result
 
-    fit_result, _ = leastsq(metric, initial, maxfev=5000 * len(station_ids))
+    fit_result, _ = leastsq(metric, initial, maxfev=10000 * len(station_ids), ftol=1e-7, xtol=1e-5)
 
     fit_error = np.average(np.abs(metric(fit_result)))
     period_by_station_id = {station_ids[i]: fit_result[i] for i in range(len(station_ids))}
 
-    print('Fit error: {} u'.format(fmt(fit_error)))
+    print('Fit error: {}'.format(fmt(fit_error)))
 
     table = PrettyTable(['Station', 'Distance/km', 'Error %', 'Period/u', 'T²/r³'])
     table.align = 'r'
@@ -109,4 +111,4 @@ with app.app_context():
             fmt(period_by_station_id[station_id]**2/avg**3),
         ])
     print(table)
-    # db.session.commit()
+    db.session.commit()
