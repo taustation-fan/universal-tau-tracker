@@ -1,7 +1,7 @@
 import os
 from utt.model import db
 from flask_cors import CORS
-from flask import Flask
+from flask import Flask, render_template
 
 def make_app():
     app = Flask(__name__)
@@ -14,3 +14,6 @@ def make_app():
 
 app = make_app()
 
+@app.route('/')
+def index():
+    return render_template('index.html')
