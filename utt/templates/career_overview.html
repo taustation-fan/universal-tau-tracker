@@ -1,0 +1,16 @@
+<html>
+<head>
+    <title>Tau Station: Career Factors over time</title>
+</head>
+
+<p>The payout from career bonuses depends on the station and time. It varies from a baseline (factor 1) to up to double of the baseline (factor 2).</p>
+
+<p>Here you can see the career factors over time per system.</p>
+
+<ul>
+    {% for system in systems %}
+        <li><a href="{{ url_for('system_career_graph', id=system.id) }}">{{ system.name }}</a></li>
+
+    {% endfor %}
+</ul>
+</html>

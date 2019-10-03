@@ -154,7 +154,13 @@ def career_station_needs_update(system, station):
 
     return jsonify({'needs_update': result})
 
-@app.route('/system/<id>/career')
+@app.route('/career')
+def career_overview():
+    systems = System.query.order_by(System.name).all()
+
+    return render_template('career_overview.html', systems=systems)
+
+@app.route('/career/system/<id>')
 def system_career_graph(id):
     system = System.query.filter_by(id=id).one()
     stations = system.stations
