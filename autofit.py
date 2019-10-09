@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import math
+import argparse
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -12,8 +13,16 @@ from utt.model import db, StationPair, StationDistanceReading as SDR
 from utt import app
 from utt.gct import as_gct
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='Automatic fitting of station pair data')
+    parser.add_argument('--improve', action='store_true')
+    parser.add_argument('station_id', type=int)
 
-pair_id = int(sys.argv[1])
+    return parser.parse_args()
+
+options = parse_args()
+
+pair_id = options.station_id
 
 with app.app_context():
     pair = StationPair.query.filter_by(id=pair_id).one()
@@ -71,9 +80,35 @@ with app.app_context():
         fit_result[0],
         min_distance,
         max_distance))
-    
+
+    phase = fit_result[3]
+    tau = 2 * np.pi
+    while phase > tau:
+        phase -= tau
+    while phase < 0:
+        phase += tau
+
+    if options.improve and pair.has_full_fit:
+        def close(a, b):
+            return (a-b)/b <= 0.01
+
+        small_difference = all((
+            close(fit_result[0], pair.fit_period_u),
+            close(pair.fit_min_distance_km, min_distance),
+            close(pair.fit_max_distance_km, max_distance),
+            close(pair.fit_phase, phase),
+        ))
+        if small_difference:
+            print('Detected only small difference, writing automatically')
+            pair.fit_period_u = fit_result[0]
+            pair.fit_min_distance_km = min_distance
+            pair.fit_max_distance_km = max_distance
+            pair.fit_phase = phase
+            db.session.commit()
+            sys.exit(0)
+        
     # regularized grid for plotting
-    xr = np.linspace(min(x), max(x), 10 * len(x))
+    xr = np.linspace(min(x), max(x), 50 * len(x))
     plt.plot(xr, f(xr, *fit_result), 'b-')
     
     plt.gcf().set_size_inches(12, 9)
@@ -85,12 +120,6 @@ with app.app_context():
         pair.fit_period_u = fit_result[0]
         pair.fit_min_distance_km = min_distance
         pair.fit_max_distance_km = max_distance
-        phase = fit_result[3]
-        tau = 2 * np.pi
-        while phase > tau:
-            phase -= tau
-        while phase < 0:
-            phase += tau
         pair.fit_phase = phase
         db.session.commit()
         print('... saved. Bye.')
