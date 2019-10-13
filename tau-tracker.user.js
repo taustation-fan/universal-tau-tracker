@@ -272,14 +272,20 @@ function extract_local_shuttles(options, station) {
 }
 
 function extract_docks(options, station) {
-    if (!$('html').hasClass('cockpit')) {
-        return;
-    }
     var token = options.token;
     if (!token) {
         utt_add_message('Please configure your access token in the user preferences', 'orange');
         return;
     }
+    if ($('html').hasClass('cockpit')) {
+        extract_docks_cockpit(token, options, station);
+    }
+    else {
+        extract_docks_fuel(token, options, station);
+    }
+}
+
+function extract_docks_cockpit(token, options, station) {
     var departure = $('html').data('time');
     var schedules = [];
     $('.area-table-item').each(function() {
@@ -326,6 +332,46 @@ function extract_docks(options, station) {
         error: function(xhr) {
             utt_add_message('cannot talk to ' + url + ': ' + xhr.response_text, 'orange');
         },
+    });
+}
+
+function extract_docks_fuel(token, options, station) {
+    let url = options.base_url + 'v1/fuel/add';
+    $('div.own-ship-details').each(function() {
+        var $ship = $( this );
+        var $meter = $ship.find('.ship-state').find('div:contains("Fuel:")').find('.meter');
+        var value_now = parseFloat($meter.attr('aria-valuenow'), 10)
+        var value_max = parseFloat($meter.attr('aria-valuemax'), 10)
+        var fuel_g = value_max - value_now;
+        if (!fuel_g) return;
+        var price = parseFloat($('div.ship-actions').find('a:contains(Refuel)').find('.currency-amount').text())
+        if (!price) return;
+
+        var payload = {
+            token: token,
+            station: station.station,
+            system: station.system,
+            fuel_g: fuel_g,
+            price: price,
+        };
+        $.ajax({
+            type: "POST",
+            url: url,
+            dataType: 'json',
+            data: JSON.stringify(payload),
+            success: function(response) {
+                if (response.recorded) {
+                    let message = 'Fuel price recorded. +1 brownie point!';
+                    utt_add_message(message);
+                }
+                else {
+                    utt_add_message('error recording fuel price: ' + response.message, 'orange');
+                }
+            },
+            error: function(xhr) {
+                utt_add_message('cannot talk to ' + url + ': ' + xhr.response_text, 'orange');
+            },
+        });
     });
 }
 
