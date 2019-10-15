@@ -160,3 +160,15 @@ class StationDistanceReading(db.Model):
 
     token_id = db.Column(db.ForeignKey('token.id'), nullable=False)
     token = db.relationship('Token')
+
+## Fuel Price Tracking
+class FuelPriceReading(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    token_id = db.Column(db.ForeignKey('token.id'), nullable=False)
+    token = db.relationship('Token')
+    station_id = db.Column(db.ForeignKey('station.id'), nullable=False)
+    station = db.relationship('Station')
+    when = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.utcnow)
+    fuel_g = db.Column(db.Float, nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    price_per_g = db.Column(db.Float, nullable=False)
