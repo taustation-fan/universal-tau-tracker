@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Tau Station Universal Tracker
-// @version      0.8
+// @version      0.9
 // @author       Moritz Lenz <moritz.lenz@gmail.com>
 // @description  General data collection script for Tau Station. Please get an access token from moritz and add it in your preferences page.
 // @match        https://alpha.taustation.space/
@@ -296,7 +296,7 @@ function extract_docks_cockpit(token, options, station) {
 
         $table.find('li.ticket-schedule-row').each(function() {
             let $row = $(this);
-            let distance = parseInt($row.find('.ticket-col-distance').find('dd').text().replace(/\s*km/, ''), 10)
+            let distance = parseInt($row.find('.ticket-col-distance').find('dd').text().replace(/\s*km/, '').replace(',', ''), 10)
             if (departure.length) {
                 distances.push([departure, distance]);
             }
