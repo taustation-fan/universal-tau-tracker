@@ -28,11 +28,24 @@ After an [initial setup](#setup), simply navigate to the [list of career tasks](
 
 The submitted data will be used to gain a better understanding of the career task bonus mechanics. Any general findings will be published in the [Tau Guide](https://tauguide.de/).
 
+[Visualization of past career factor data by system is available](https://tracker.tauguide.de/career).
+
 ### Station Distances
 
 Space Stations in Tau Station [orbit a central body](https://tauguide.de/orbital-mechanics).
 
 If you visit the [Local Shuttles page](https://alpha.taustation.space/travel/area/local-shuttles), the userscript will automatically record the distances between stations, which helps us to reverse engineer orbital parameters, such as radius and orbital period.
+
+[This page](https://tracker.tauguide.de/distance) visualizes station distances over time.
+
+### Fuel Prices
+
+The [October 2019 update](https://blog.taustation.space/blog/update-changelog-2019-oct-15/) introduced variable fuel prices.
+When you visit [the docks](https://alpha.taustation.space/area/docks) and have a private ship there (but aren't inside the cockpit),
+the userscript automatically records the current station's fuel price per gram, and gives you an overview of current fuel prices.
+
+In addition, a [public page](https://tracker.tauguide.de/fuel) gives an overview of fuel price ranges observed per station.
+
 
 
 ## Setup
