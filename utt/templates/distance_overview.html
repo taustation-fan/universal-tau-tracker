@@ -1,7 +1,7 @@
-<html>
-<head>
-    <title>Tau Station: Station Distance Recordings</title>
-</head>
+{% extends "base.html" %}
+{% block title %}Tau Station: Station Distance Recordings{% endblock %}
+{% block content %}
+
 <p>With {{ total }} data points so far. <a href="https://github.com/taustation-fan/universal-tau-tracker#readme">Help collecting data through a simple userscript!</a></p>
 
 <p>🗹 : Orbital parameters and predictions available</br>
@@ -16,4 +16,5 @@
     {% endfor %}
 </ul>
 {% endfor %}
-</html>
+
+{% endblock %}

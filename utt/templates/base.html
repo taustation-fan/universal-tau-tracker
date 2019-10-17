@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <link rel="stylesheet" href="/static/style.css" />
+    <title>{% block title %}{% endblock %}</title>
+    {% endblock %}
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="/">Start</a></li>
+            <li><a href="/career">Career</a></li>
+            <li><a href="/distance">Station Distances</a></li>
+            <li><a href="/fuel">Fuel Prices</a></li>
+        </ul>
+    </nav>
+    <main id="content">
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        {% block footer %}
+        <p>This site is a fan project related to the <a href="https://alpha.taustation.space/">Tau Station text based MMORPG</a>.</p>
+        <p>It tracks time-dependent data submitted by user scripts. See <a href="https://github.com/taustation-fan/universal-tau-tracker#readme">the project's description and source code</a>.</p>
+        {% endblock %}
+    </footer>
+</body>
+</html>

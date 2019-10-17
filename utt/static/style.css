@@ -1,0 +1,21 @@
+nav li {
+    display: inline-block;
+    padding: 0.5ex;
+    background-color: #CCC;
+    margin-bottom: 2ex;
+}
+nav li a {
+    color: black;
+}
+
+footer {
+    background-color: #CCC;
+    border-top: 2px solid black;
+    margin: 0px;
+    margin-top: 5ex;
+    padding: 1ex;
+}
+
+main {
+    margin: 1ex;
+}
