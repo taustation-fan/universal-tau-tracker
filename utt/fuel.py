@@ -9,7 +9,9 @@ from .app import app
 from utt.model import db, \
                       get_station, \
                       Token, \
-                      FuelPriceReading
+                      FuelPriceReading, \
+                      FuelPriceStatistics as FPS
+from utt.gct import gct_duration
 
 def now():
     return datetime.now(timezone.utc)
@@ -43,8 +45,29 @@ def fuel_add():
     )
     db.session.add(reading)
 
-    response = {'recorded': True, 'systems': { station.system.name: { station.name: price_per_g } } }
+    response = {
+        'recorded': True,
+        'systems': { station.system.name: { station.name: price_per_g } },
+        'message': render_fuel_add_response(station),
+    }
     print('Recorded fuel price {} for station {} by  {}, {}'.format(price_per_g, station.name, token.character.name, datetime.now()))
+
     db.session.commit()
 
     return jsonify(response)
+
+def render_fuel_add_response(current_station):
+    start_dt = now()
+    reference_date = start_dt - timedelta(hours=8)
+    rows = []
+
+    for stat in FPS.query.filter(FPS.last_reading >= reference_date).order_by(FPS.system_name, FPS.station_level, FPS.station_name):
+        station_name = stat.station_short_name or stat.station_name
+        diff = start_dt - stat.last_reading
+        rows.append({
+            'station_name': station_name,
+            'is_current':   stat.station_id == current_station.id,
+            'price_per_g':  '{:.1f}'.format(stat.last_price),
+            'age': gct_duration(start_dt - stat.last_reading),
+        })
+    return str(render_template('fuel_short_table.html', rows=rows))

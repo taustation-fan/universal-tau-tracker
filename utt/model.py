@@ -31,6 +31,7 @@ class Station(db.Model):
     system_id = db.Column(db.ForeignKey('system.id'), nullable=False)
     system = db.relationship('System', backref='stations')
     name = db.Column(db.String(200), unique=True, nullable=False)
+    short = db.Column(db.String())
     name_lower = db.Column(db.String(200), unique=True, nullable=False)
     fit_radius_km = db.Column(db.Float)
     fit_period_u = db.Column(db.Float)
@@ -172,3 +173,14 @@ class FuelPriceReading(db.Model):
     fuel_g = db.Column(db.Float, nullable=False)
     price = db.Column(db.Float, nullable=False)
     price_per_g = db.Column(db.Float, nullable=False)
+
+class FuelPriceStatistics(db.Model):
+    station_id = db.Column(db.Integer, primary_key=True)
+    station_name = db.Column(db.String(255), nullable=False)
+    station_short_name = db.Column(db.String(255))
+    station_level = db.Column(db.Integer)
+    system_name = db.Column(db.String(255), nullable=False)
+    last_reading = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.utcnow)
+    min_price = db.Column(db.Float, nullable=False)
+    max_price = db.Column(db.Float, nullable=False)
+    last_price = db.Column(db.Float, nullable=False)

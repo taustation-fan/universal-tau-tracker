@@ -1,0 +1,18 @@
+<table>
+    <thead>
+        <tr>
+            <th>Station</th>
+            <th>Price c/g</th>
+            <th>Age</th>
+        </tr>
+    </thead>
+        {% for row in rows %}
+            <tr>
+                <td>{% if row.is_current %}<b>{{ row.station_name }}</b>{% else %}{{ row.station_name }}{% endif %}</td>
+                <td>{{ row.price_per_g }}</td>
+                <td>{{ row.age }}</td>
+            </tr>
+        {% endfor %}
+    <tbody>
+    </tbody>
+</table>

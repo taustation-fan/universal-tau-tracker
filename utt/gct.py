@@ -20,3 +20,14 @@ def as_gct(dt, format=True):
     return total_units[:-7] + '.' + total_units[-7:-5] \
                            + '/' + total_units[-5:-3] \
                            + ':' + total_units[-3:]
+
+def gct_duration(delta):
+    units = int(delta.total_seconds() / 0.864)
+    days = int(units / 100_000)
+    units -= days * 100_000
+    unit_str = '{:05d}'.format(units)
+    unit_str = unit_str[0:2] + ':' + unit_str[2:]
+    if days > 0:
+        return 'D{:02d}/{}'.format(days, unit_str)
+    else:
+        return 'D/' + unit_str
