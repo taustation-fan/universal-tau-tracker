@@ -1,0 +1,35 @@
+<html>
+<head>
+    <title>Tau Station: Career Factors over time</title>
+</head>
+
+<p>Fuel prices for private ships fluctuate quite a bit, but tend to be higher for higher-level stations.</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>System</th>
+            <th>Station</th>
+            <th>Short name</th>
+            <th>Level</th>
+            <th>Min price / g</th>
+            <th>Max price / g</th>
+            <th>Spread max/min</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+            <tr>
+                <td>{{ row.system_name }}</td>
+                <td>{{ row.station_name }}</td>
+                <td>{{ row.station_short_name }}</td>
+                <td>{{ row.station_level }}</td>
+                <td>{{ row.min_price | round(2) }}</td>
+                <td>{{ row.max_price | round(2) }}</td>
+                <td>{{ (row.max_price / row.min_price) | round(4) }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</html>

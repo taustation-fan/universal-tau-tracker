@@ -71,3 +71,8 @@ def render_fuel_add_response(current_station):
             'age': gct_duration(start_dt - stat.last_reading),
         })
     return str(render_template('fuel_short_table.html', rows=rows))
+
+@app.route('/fuel')
+def fuel_list():
+    stats = FPS.query.order_by(FPS.system_name, FPS.station_level, FPS.station_name).all()
+    return render_template('fuel_list.html', rows=stats)
