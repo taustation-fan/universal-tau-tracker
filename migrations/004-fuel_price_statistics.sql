@@ -1,5 +1,5 @@
 DROP VIEW fuel_price_statistics;
-CREATE OR REPLACE VIEW fuel_price_statistics (station_id, station_name, station_short_name, station_level, system_name, last_reading, min_price, max_price, last_price) AS
+CREATE OR REPLACE VIEW fuel_price_statistics (station_id, station_name, station_short_name, station_level, system_name, system_rank, last_reading, min_price, max_price, last_price) AS
 WITH fuel_price_reading_grouped AS (
     SELECT station_id,
            MAX("when") AS last_timestamp,
@@ -13,6 +13,7 @@ SELECT station.id,
        station.short,
        station.level,
        system.name,
+       system.rank,
        fuel_price_reading_grouped.last_timestamp, 
        fuel_price_reading_grouped.min_price,
        fuel_price_reading_grouped.max_price,

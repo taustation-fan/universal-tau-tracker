@@ -180,6 +180,7 @@ class FuelPriceStatistics(db.Model):
     station_short_name = db.Column(db.String(255))
     station_level = db.Column(db.Integer)
     system_name = db.Column(db.String(255), nullable=False)
+    system_rank = db.Column(db.Integer)
     last_reading = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.utcnow)
     min_price = db.Column(db.Float, nullable=False)
     max_price = db.Column(db.Float, nullable=False)
