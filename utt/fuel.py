@@ -61,7 +61,7 @@ def render_fuel_add_response(current_station):
     reference_date = start_dt - timedelta(hours=8)
     rows = []
 
-    for stat in FPS.query.filter(FPS.last_reading >= reference_date).order_by(FPS.system_name, FPS.station_level, FPS.station_name):
+    for stat in FPS.query.filter(FPS.last_reading >= reference_date).order_by(FPS.last_price, FPS.station_name):
         station_name = stat.station_short_name or stat.station_name
         diff = start_dt - stat.last_reading
         rows.append({
