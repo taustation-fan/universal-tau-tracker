@@ -1,16 +1,7 @@
-<html>
-<head>
-<title>{{ pair_string }}</title>
-    <meta charset="utf-8">
-    <style>
-        canvas {
-            margin: 2ex;
-            padding: 2ex;
-        }
-    </style>
-</head>
-<body>
-    <h1>{{ pair_string }}</h1>
+{% extends "base.html" %}
+{% block title %}{{ pair_string }} distances{% endblock %}
+{% block content %}
+    <h1>{{ pair_string }} distances</h1>
 
     <p><a href="{{ url_for('distance_overview') }}">Back to station distances overview.</a></p>
 
@@ -72,5 +63,4 @@
             })
         };
     </script>
-</body>
-</html>
+{% endblock %}

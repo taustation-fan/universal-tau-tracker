@@ -1,15 +1,6 @@
-<html>
-<head>
-<title>{{ system.name }} Career Factors</title>
-    <meta charset="utf-8">
-    <style>
-        canvas {
-            margin: 2ex;
-            padding: 2ex;
-        }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}{{ system.name }} Career Factors{% endblock %}
+{% block content %}
     <h1>{{ system.name }} Career Factors</h1>
 
     <canvas id="myChart" width="600" height="300"></canvas>
@@ -57,5 +48,4 @@
             })
         };
     </script>
-</body>
-</html>
+{% endblock %}

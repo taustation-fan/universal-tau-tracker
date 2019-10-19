@@ -19,3 +19,8 @@ footer {
 main {
     margin: 1ex;
 }
+canvas {
+    margin: 2ex;
+    padding: 2ex;
+    max-width: 90%;
+}
