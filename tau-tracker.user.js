@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Tau Station Universal Tracker
-// @version      1.0
+// @version      1.1
 // @author       Moritz Lenz <moritz.lenz@gmail.com>
 // @description  General data collection script for Tau Station. Please get an access token from moritz and add it in your preferences page.
 // @match        https://alpha.taustation.space/
@@ -345,7 +345,7 @@ function extract_docks_fuel(token, options, station) {
         var value_max = parseFloat($meter.attr('aria-valuemax'), 10)
         var fuel_g = value_max - value_now;
         if (!fuel_g) return;
-        var price = parseFloat($('div.ship-actions').find('a:contains(Refuel)').find('.currency-amount').text())
+        var price = parseFloat($ship.find('a:contains(Refuel)').find('.currency-amount').text())
         if (!price) return;
 
         var payload = {
