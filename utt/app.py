@@ -23,3 +23,7 @@ def index():
 @app.route('/static/<path:path>')
 def static_files(path):
     return send_from_directory('static', path)
+
+@app.route('/favicon.ico')
+def static_file_favicon():
+    return send_from_directory('static', 'favicon.ico')
