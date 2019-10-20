@@ -89,8 +89,6 @@ def fuel_min_max_png():
         x.append(fps.station_level)
         y1.append(fps.min_price)
         y2.append(fps.max_price)
-    print(x)
-    print(y1)
 
     plt.clf()
     plt.cla()
