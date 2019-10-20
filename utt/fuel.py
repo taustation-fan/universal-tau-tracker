@@ -1,7 +1,10 @@
 from datetime import datetime, timedelta, timezone
 import json
+from io import BytesIO
 
-from flask import request, jsonify, Response, render_template
+import matplotlib
+import matplotlib.pyplot as plt
+from flask import request, jsonify, Response, render_template, send_file
 from sqlalchemy import func
 
 from .app import app
@@ -76,3 +79,30 @@ def render_fuel_add_response(current_station):
 def fuel_list():
     stats = FPS.query.order_by(FPS.system_rank, FPS.system_name, FPS.station_level, FPS.station_name).all()
     return render_template('fuel_list.html', rows=stats)
+
+@app.route('/fuel/min_max.png')
+def fuel_min_max_png():
+    x = []
+    y1 = []
+    y2 = []
+    for fps in FPS.query.order_by(FPS.station_level):
+        x.append(fps.station_level)
+        y1.append(fps.min_price)
+        y2.append(fps.max_price)
+    print(x)
+    print(y1)
+
+    plt.clf()
+    plt.cla()
+    plt.title('Fuel price over station level')
+    plt.plot(x, y1, 'bo', label='Min')
+    plt.plot(x, y2, 'ro', label='Max')
+    plt.xlabel('Station level')
+    plt.ylabel('Fuel price in credits / g')
+    plt.legend()
+    plt.tight_layout()
+    
+    img = BytesIO()
+    plt.savefig(img)
+    img.seek(0)
+    return send_file(img, mimetype='image/png')
