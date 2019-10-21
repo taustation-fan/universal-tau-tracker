@@ -93,6 +93,8 @@ def fuel_min_max_png():
     plt.clf()
     plt.cla()
     plt.title('Fuel price over station level')
+    if x:
+        plt.axes(xticks=list(range(1, x[-1], 2)))
     plt.plot(x, y1, 'bo', label='Min')
     plt.plot(x, y2, 'ro', label='Max')
     plt.xlabel('Station level')
