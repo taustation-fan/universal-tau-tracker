@@ -25,6 +25,7 @@ def get_station(system_name, station_name, create=True):
 class System(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), unique=True, nullable=False)
+    rank = db.Column(db.Integer)
 
 class Station(db.Model):
     id = db.Column(db.Integer, primary_key=True)

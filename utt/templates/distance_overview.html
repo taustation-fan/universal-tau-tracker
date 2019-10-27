@@ -7,10 +7,10 @@
 <p>🗹 : Orbital parameters and predictions available</br>
 ☐ : Orbital parameters missing, please help collect more data!</p>
 
-{% for system_name, pairs in systems.items()|sort(attribute='0') %}
-<h2>{{ system_name }}</h2>
+{% for system in systems %}
+<h2>{{ system.name }}</h2>
 <ul>
-    {% for name, pair in pairs.items()|sort(attribute='0'): %}
+    {% for name, pair in system.station_pairs.items()|sort(attribute='0'): %}
         <li>{% if pair.has_fit %}🗹{% else %}☐{% endif %} <a href="{{ pair.url }}">{{ name }}</a> ({{pair.count}} readings)</li>
 
     {% endfor %}

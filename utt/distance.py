@@ -88,19 +88,28 @@ def distance_overview():
     station_pairs = defaultdict(dict)
 
     total_count = 0;
-    for sp in StationPair.query.all():
-        count = sp.readings_count
-        if count > 0:
-            total_count += count
-            station_pairs[sp.system.name][str(sp)] = {
-                'id': sp.id,
-                'count': count,
-                'url': url_for('distance_pair', id=sp.id),
-                'has_fit': sp.has_full_fit,
-            }
+    systems = []
+    for system in System.query.order_by(System.rank, System.name):
+        system_dict = {
+            'id': system.id,
+            'name': system.name,
+            'station_pairs': {},
+        }
+        for sp in StationPair.query.filter_by(system_id=system.id):
+            count = sp.readings_count
+            if count > 0:
+                total_count += count
+                system_dict['station_pairs'][str(sp)] = {
+                    'id': sp.id,
+                    'count': count,
+                    'url': url_for('distance_pair', id=sp.id),
+                    'has_fit': sp.has_full_fit,
+                }
+        if system_dict['station_pairs']:
+            systems.append(system_dict)
     if request.content_type == 'application/json':
         return jsonify(station_pairs)
-    return render_template('distance_overview.html', systems=station_pairs, total=total_count)
+    return render_template('distance_overview.html', systems=systems, total=total_count)
 
 @app.route('/distance/pair/<id>')
 def distance_pair(id):
