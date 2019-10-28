@@ -28,3 +28,24 @@ canvas {
 .right {
     text-align: right;
 }
+
+tr, td {
+	vertical-align: top;
+}
+
+table {
+    border-collapse: collapse;
+    border: 1px solid #9f9f9f;
+}
+tr { border-top: 1px solid #9f9f9f; }
+
+td, th {
+    padding: 0.2em 0.4em;
+}
+
+th {
+    background-color: #ddd;
+    border-bottom: 1px solid #9f9f9f;
+    border-top: 2px solid #444;
+}
+
