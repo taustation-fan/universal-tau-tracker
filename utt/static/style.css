@@ -24,3 +24,7 @@ canvas {
     padding: 2ex;
     max-width: 90%;
 }
+
+.right {
+    text-align: right;
+}

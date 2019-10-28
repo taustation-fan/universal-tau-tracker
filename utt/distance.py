@@ -104,6 +104,10 @@ def distance_overview():
                     'count': count,
                     'url': url_for('distance_pair', id=sp.id),
                     'has_fit': sp.has_full_fit,
+                    'fit_period_u': sp.fit_period_u,
+                    'fit_min_distance_km': sp.fit_min_distance_km,
+                    'fit_max_distance_km': sp.fit_max_distance_km,
+                    'fit_phase': sp.fit_phase,
                 }
         if system_dict['station_pairs']:
             systems.append(system_dict)

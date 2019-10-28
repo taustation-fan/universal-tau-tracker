@@ -4,17 +4,35 @@
 
 <p>With {{ total }} data points so far. <a href="https://github.com/taustation-fan/universal-tau-tracker#readme">Help collecting data through a simple userscript!</a></p>
 
-<p>🗹 : Orbital parameters and predictions available</br>
-☐ : Orbital parameters missing, please help collect more data!</p>
-
+<table>
+    <thead>
+        <tr>
+            <th>Station</th>
+            <th># Data Points</th>
+            <th>Relative period/u</th>
+            <th>Min distance/km</th>
+            <th>Max distance/km</th>
+            <th>Phase</th>
+        </tr>
+    <thead>
+    <tbody>
 {% for system in systems %}
-<h2>{{ system.name }}</h2>
-<ul>
-    {% for name, pair in system.station_pairs.items()|sort(attribute='0'): %}
-        <li>{% if pair.has_fit %}🗹{% else %}☐{% endif %} <a href="{{ pair.url }}">{{ name }}</a> ({{pair.count}} readings)</li>
-
-    {% endfor %}
-</ul>
+        <tr>
+            <th colspan="6">{{ system.name }}</th>
+        </tr>
+        {% for name, pair in system.station_pairs.items()|sort(attribute='0'): %}
+            <tr>
+                <td><a href="{{ pair.url }}">{{ name }}</a></td>
+                <td class="right">{{ pair.count }}</th>
+                <td class="right">{{pair.fit_period_u | int if pair.fit_period_u }}</td>
+                <td class="right">{{pair.fit_min_distance_km | int if pair.fit_min_distance_km }}</td>
+                <td class="right">{{pair.fit_max_distance_km | int if pair.fit_max_distance_km }}</td>
+                <td class="right">{{pair.fit_phase|round(3) if pair.fit_phase }}</td>
+            </tr>
+        {% endfor %}
 {% endfor %}
+    </tbody>
+</table>
+       
 
 {% endblock %}

@@ -56,7 +56,7 @@ with app.app_context():
     phase = pair.fit_phase or 0.0
 
     est_freq = 1 / period
-    freqs = np.linspace(est_freq / fudge_factor, est_freq * fudge_factor, 800)
+    freqs = np.linspace(est_freq / fudge_factor, est_freq * fudge_factor, 1600)
     
     power = LombScargle(x, y).power(freqs)
     period = 1/freqs[np.argmax(power)]
