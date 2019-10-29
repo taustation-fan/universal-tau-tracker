@@ -2,6 +2,7 @@
 import sys
 import math
 from collections import defaultdict
+import argparse
 
 from prettytable import PrettyTable
 import numpy as np
@@ -11,7 +12,15 @@ from utt.model import db, System, StationPair
 from utt import app
 from utt.gct import as_gct
 
-system_id = int(sys.argv[1])
+def parse_args():
+    parser = argparse.ArgumentParser(description='Find station fit params for a system')
+    parser.add_argument('--write', action='store_true')
+    parser.add_argument('system_id', type=int)
+    return parser.parse_args()
+
+options = parse_args()
+
+system_id = options.system_id
 
 def fmt(number):
     return '{:.2f}'.format(number)
@@ -110,5 +119,9 @@ with app.app_context():
             fmt(period_by_station_id[station_id]),
             fmt(period_by_station_id[station_id]**2/avg**3),
         ])
+        if options.write:
+            station.fit_radius_km = avg
+            station.fit_period_u = period_by_station_id[station_id]
     print(table)
-    db.session.commit()
+    if options.write:
+        db.session.commit()
