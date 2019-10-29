@@ -290,4 +290,5 @@ def distance_system(system_id):
                            system_id=system.id,
                            u=time,
                            gct=as_gct(dt),
+                           positions=get_positions(system, time),
                            )

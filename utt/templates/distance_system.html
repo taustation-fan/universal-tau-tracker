@@ -10,4 +10,26 @@
 <img src="{{ url_for('distance_system_png', system_id=system_id, u=u) }}"></img>
 </p>
 
+<table>
+    <thead>
+        <tr>
+            <th>Distance</th>
+            {% for p in positions %}
+                <th>{{ p.station.name }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for outer in positions %}
+            <tr>
+                <th>{{ outer.station.name }}</th>
+                {% for inner in positions %}
+                    <td>{{ outer.distance_to(inner) | int }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+
+    </tbody>
+</table>
+
 {% endblock %}
