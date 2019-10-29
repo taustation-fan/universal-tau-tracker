@@ -18,7 +18,7 @@
     <tbody>
 {% for system in systems %}
         <tr>
-            <th colspan="6">{{ system.name }}</th>
+            <th colspan="6"><a  href="{{ url_for('distance_system', system_id=system.id) }}">{{ system.name }}</a></th>
         </tr>
         {% for name, pair in system.station_pairs.items()|sort(attribute='0'): %}
             <tr>

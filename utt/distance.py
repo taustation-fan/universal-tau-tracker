@@ -1,6 +1,7 @@
 import pytz
 import json
 import re
+import math
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from io import BytesIO
@@ -208,3 +209,85 @@ def distance_pair_prediction_png(id):
     plt.savefig(img)
     img.seek(0)
     return send_file(img, mimetype='image/png')
+
+class StationPosition:
+    def __init__(self, station, time, phase):
+        self.station = station
+        self.time    = time
+        self.phase   = phase
+
+    @property
+    def x(self):
+        return self.station.fit_radius_km * math.cos(self.phase)
+
+    @property
+    def y(self):
+        return self.station.fit_radius_km * math.sin(self.phase)
+
+    def distance_to(self, other):
+        return np.sqrt( (other.y - self.y) ** 2 + (other.x - self.x) ** 2)
+
+def get_positions(system, time):
+    stations = Station.query.filter_by(system_id=system.id).order_by(Station.fit_radius_km.desc()).all()
+    base = stations.pop(0)
+
+    initial_phase = 0
+    if base.fit_period_u is not None:
+        arg = time / base.fit_period_u
+        arg - int(arg)
+        initial_phase = 2 * np.pi * arg
+
+    positions = [StationPosition(base, time, initial_phase)]
+    for station in stations:
+        pair = get_station_pair(station, base)
+        arg = time / pair.fit_period_u
+        arg -= int(arg)
+        phase = pair.fit_phase + 2 * np.pi * arg
+        positions.append(StationPosition(station, time, phase + initial_phase))
+    return positions
+
+@app.route('/distance/system/<system_id>.png')
+def distance_system_png(system_id):
+    system = System.query.filter_by(id=system_id).one()
+    time = request.args.get('u')
+    if time is None:
+        time = float(as_gct(datetime.now(timezone.utc), format=False))
+    else:
+        time = float(time)
+
+    positions = get_positions(system, time)
+
+    x = [0] + [p.x for p in positions]
+    y = [0] + [p.y for p in positions]
+
+    size = positions[0].station.fit_radius_km * 1.1
+
+    plt.clf()
+    plt.cla()
+    fig, ax = plt.subplots()
+    plt.title('{} system'.format(system.name))
+    plt.xlabel('x / km')
+    plt.ylabel('y / km')
+    plt.ylim(-size, size)
+    plt.xlim(-size, size)
+    ax.scatter(x, y)
+    ax.annotate('Central body', (0.0, 0.0))
+    for p in positions:
+        ax.annotate(p.station.name, (p.x, p.y))
+    img = BytesIO()
+    plt.savefig(img)
+    img.seek(0)
+    return send_file(img, mimetype='image/png')
+
+@app.route('/distance/system/<system_id>')
+def distance_system(system_id):
+    system = System.query.filter_by(id=system_id).one()
+    dt = datetime.now(timezone.utc)
+    time = float(as_gct(dt, format=False))
+    
+    return render_template('distance_system.html',
+                           system_name=system.name,
+                           system_id=system.id,
+                           u=time,
+                           gct=as_gct(dt),
+                           )
