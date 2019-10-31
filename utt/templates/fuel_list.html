@@ -27,7 +27,7 @@
                 <td>{{ row.station_level }}</td>
                 <td>{{ row.min_price | round(2) }}</td>
                 <td>{{ row.max_price | round(2) }}</td>
-                <td>{{ (row.max_price / row.min_price) | round(4) }}</td>
+                <td>{{ (row.max_price / row.min_price) | round(2) }}</td>
             </tr>
         {% endfor %}
     </tbody>
