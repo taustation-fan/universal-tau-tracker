@@ -49,3 +49,7 @@ th {
     border-top: 2px solid #444;
 }
 
+ul.subnav li {
+    display: inline-block;
+    padding: 1.5ex;
+}

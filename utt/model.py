@@ -27,6 +27,9 @@ class System(db.Model):
     name = db.Column(db.String(200), unique=True, nullable=False)
     rank = db.Column(db.Integer)
 
+    __mapper_args__ = {'order_by': ['rank', 'name']}
+
+
 class Station(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     system_id = db.Column(db.ForeignKey('system.id'), nullable=False)

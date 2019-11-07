@@ -184,5 +184,6 @@ def system_career_graph(id):
     ctx = {
         'system': system,
         'datasets': json.dumps(datasets),
+        'systems': System.query.all()
     }
     return render_template('system_career_factor.html', **ctx)
