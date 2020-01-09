@@ -10,6 +10,9 @@
     {% if max_distance%}
     <p>The recorded distances vary between {{ min_distance }} and {{ max_distance }} km.</p>
     {% endif %}
+    {% if fit_period_u %}
+    <p>The relative period is {{ fit_period_u }}.</p>
+    {% endif %}
 
     <p><a href="{{ url_for('distance_pair_csv', id=id) }}">Download as CSV.</a></p>
 

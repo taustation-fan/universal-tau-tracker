@@ -22,7 +22,11 @@ def as_gct(dt, format=True):
                            + ':' + total_units[-3:]
 
 def gct_duration(delta):
-    units = int(delta.total_seconds() / 0.864)
+    if isinstance(delta, int):
+        seconds = delta
+    else:
+        seconds = delta.total_seconds()
+    units = int(seconds / 0.864)
     days = int(units / 100_000)
     units -= days * 100_000
     unit_str = '{:05d}'.format(units)

@@ -16,7 +16,7 @@ from sqlalchemy import func
 
 from .app import app
 
-from utt.gct import as_gct, parse_gct
+from utt.gct import as_gct, parse_gct, gct_duration
 from utt.model import db, \
                       get_station, \
                       get_station_pair, \
@@ -141,6 +141,7 @@ def distance_pair(id):
         'min_distance': min_distance,
         'max_distance': max_distance,
         'has_prediction': pair.has_full_fit,
+        'fit_period_u': pair.fit_period_u and gct_duration(int(pair.fit_period_u * 0.864)),
     }
     if request.content_type == 'application/json':
         return jsonify(result)
