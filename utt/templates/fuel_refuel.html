@@ -7,7 +7,7 @@
         <tr>
             <th>Station</th>
             <th class="right">Last Price c/gram</th>
-            <th>Recorded</th>
+            <th>Age</th>
         </tr>
     </thead>
     <tbody>
@@ -15,7 +15,7 @@
             <tr>
                 <td>{{ row.station_short_name }}</td>
                 <td class="right">{{ row.last_price | round(1) }}</td>
-                <td>{{ row.last_reading.strftime("%Y-%m-%d %H:%M") }}</td>
+                <td>{{ row.age_gct }}</td>
             </tr>
         {% endfor %}
     </tbody>

@@ -111,6 +111,14 @@ def fuel_min_max_png():
 def fuel_lowest(token):
     token = Token.query.filter_by(token=token).first()
     assert token, 'Need valid token'
+    n = now()
     
     refuel = FPS.query.order_by(FPS.last_price.asc()).limit(15)
-    return render_template('fuel_refuel.html', rows=refuel)
+    rows = [{
+                'station_short_name': r.station_short_name,
+                'last_price': r.last_price,
+                'age_gct':  gct_duration(n - r.last_reading),
+             } for r in refuel]
+
+    
+    return render_template('fuel_refuel.html', rows=rows)
