@@ -106,3 +106,11 @@ def fuel_min_max_png():
     plt.savefig(img)
     img.seek(0)
     return send_file(img, mimetype='image/png')
+
+@app.route('/fuel/lowest/<token>')
+def fuel_lowest(token):
+    token = Token.query.filter_by(token=token).first()
+    assert token, 'Need valid token'
+    
+    refuel = FPS.query.order_by(FPS.last_price.asc()).limit(15)
+    return render_template('fuel_refuel.html', rows=refuel)

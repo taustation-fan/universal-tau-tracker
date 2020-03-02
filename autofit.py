@@ -16,16 +16,20 @@ from utt.gct import as_gct
 def parse_args():
     parser = argparse.ArgumentParser(description='Automatic fitting of station pair data')
     parser.add_argument('--improve', action='store_true')
-    parser.add_argument('station_id', type=int)
+    parser.add_argument('--all', action='store_true')
+    parser.add_argument('station_id', type=int, nargs='?')
 
     return parser.parse_args()
 
 options = parse_args()
+if options.all:
+    options.improve = True
+else:
+    assert options.station_id, 'Need --all or station_id'
 
-pair_id = options.station_id
 
-with app.app_context():
-    pair = StationPair.query.filter_by(id=pair_id).one()
+
+def improve_one(pair, interactive=True):
     readings = SDR.query.filter_by(station_pair_id=pair.id).order_by(SDR.when)
 
     x = []
@@ -104,9 +108,10 @@ with app.app_context():
             pair.fit_min_distance_km = min_distance
             pair.fit_max_distance_km = max_distance
             pair.fit_phase = phase
-            db.session.commit()
-            sys.exit(0)
+            return True
         
+    if not interactive:
+        return False
     # regularized grid for plotting
     xr = np.linspace(min(x), max(x), 50 * len(x))
     plt.plot(xr, f(xr, *fit_result), 'b-')
@@ -123,3 +128,23 @@ with app.app_context():
         pair.fit_phase = phase
         db.session.commit()
         print('... saved. Bye.')
+
+with app.app_context():
+    if options.all:
+        failed = []
+        for pair in StationPair.query:
+            success = improve_one(pair, interactive=False)
+            if not success:
+                failed.append(pair)
+        if failed:
+            print('\n\nFAILED:')
+            for pair in failed:
+                print('   {}  {}'.format(pair.id, pair))
+            
+    else:
+        pair = StationPair.query.filter_by(id=options.station_id).one()
+        improve_one(pair)
+
+    if options.improve:
+        db.session.commit()
+

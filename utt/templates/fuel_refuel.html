@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Tau Station: Recent Fuel Prices{% endblock %}
+{% block content %}
+
+<table>
+    <thead>
+        <tr>
+            <th>Station</th>
+            <th class="right">Last Price c/gram</th>
+            <th>Recorded</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+            <tr>
+                <td>{{ row.station_short_name }}</td>
+                <td class="right">{{ row.last_price | round(1) }}</td>
+                <td>{{ row.last_reading.strftime("%Y-%m-%d %H:%M") }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
