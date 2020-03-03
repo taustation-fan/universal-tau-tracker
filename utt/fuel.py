@@ -51,7 +51,7 @@ def fuel_add():
     response = {
         'recorded': True,
         'systems': { station.system.name: { station.name: price_per_g } },
-        'message': render_fuel_add_response(station),
+        'message': render_fuel_add_response(station, token_str),
     }
     print('Recorded fuel price {} for station {} by  {}, {}'.format(price_per_g, station.name, token.character.name, datetime.now()))
 
@@ -59,7 +59,7 @@ def fuel_add():
 
     return jsonify(response)
 
-def render_fuel_add_response(current_station):
+def render_fuel_add_response(current_station, token):
     start_dt = now()
     reference_date = start_dt - timedelta(hours=8)
     rows = []
@@ -72,6 +72,7 @@ def render_fuel_add_response(current_station):
             'is_current':   stat.station_id == current_station.id,
             'price_per_g':  '{:.1f}'.format(stat.last_price),
             'age': gct_duration(start_dt - stat.last_reading),
+            'token': token,
         })
     return str(render_template('fuel_short_table.html', rows=rows))
 

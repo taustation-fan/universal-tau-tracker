@@ -6,6 +6,7 @@
             <th>Age</th>
         </tr>
     </thead>
+    <tbody>
         {% for row in rows %}
             <tr>
                 <td>{% if row.is_current %}<b>→ {{ row.station_name }}</b>{% else %}{{ row.station_name }}{% endif %}</td>
@@ -13,8 +14,7 @@
                 <td>{{ row.age }}</td>
             </tr>
         {% endfor %}
-    <tbody>
     </tbody>
 </table>
 
-<p><a href="https://tracker.tauguide.de/fuel">See all fuel price ranges.</a></p>
+<p><a href="https://tracker.tauguide.de/fuel">See all fuel price ranges</a> and <a href="https://tracker.tauguide.de/fuel/lowest/{{token}}">lowest prices</a>.</p>
