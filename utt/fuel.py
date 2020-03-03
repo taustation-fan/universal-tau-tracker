@@ -72,9 +72,8 @@ def render_fuel_add_response(current_station, token):
             'is_current':   stat.station_id == current_station.id,
             'price_per_g':  '{:.1f}'.format(stat.last_price),
             'age': gct_duration(start_dt - stat.last_reading),
-            'token': token,
         })
-    return str(render_template('fuel_short_table.html', rows=rows))
+    return str(render_template('fuel_short_table.html', rows=rows, token=token))
 
 @app.route('/fuel')
 def fuel_list():
