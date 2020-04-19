@@ -15,7 +15,8 @@ def get_station(system_name, station_name, create=True):
     if not station:
         assert create, 'No such station {} in {} system'.format(station_name, system_name)
 
-        assert not ('Confined to the' in station_name or 'Doing activity' in station_name or 'Hotel Room' in station_name), \
+        assert not ('Confined to the' in station_name or 'Doing activity' in station_name
+                    or 'Hotel Room' in station_name or 'Docking' in station_name), \
             '{} does not look like a proper station name'.format(station_name)
         station = Station(system=system, name=station_name, name_lower=station_name.lower())
         db.session.add(station)
