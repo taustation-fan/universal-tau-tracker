@@ -21,7 +21,7 @@
     <tbody>
         {% for row in rows %}
             <tr>
-                <td>{{ row.system_name }}</td>
+                <td><a href="{{url_for('system_fuel_price', id=row.station.system.id )}}">{{ row.system_name }}</a></td>
                 <td>{{ row.station_name }}</td>
                 <td>{{ row.station_short_name }}</td>
                 <td>{{ row.station_level }}</td>

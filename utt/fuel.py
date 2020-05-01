@@ -8,12 +8,14 @@ from flask import request, jsonify, Response, render_template, send_file
 from sqlalchemy import func
 
 from .app import app
+from utt.util import today_datetime
 
 from utt.model import db, \
                       get_station, \
                       Token, \
                       FuelPriceReading, \
-                      FuelPriceStatistics as FPS
+                      FuelPriceStatistics as FPS, \
+                      System
 from utt.gct import gct_duration
 
 def now():
@@ -122,3 +124,29 @@ def fuel_lowest(token):
 
     
     return render_template('fuel_refuel.html', rows=rows)
+
+@app.route('/fuel/system/<id>')
+def system_fuel_price(id):
+    system = System.query.filter_by(id=id).one()
+    stations = system.stations
+    limit = today_datetime()
+    datasets = []
+    colors = '#cd6155 #9b59b6 #2980b9 #1abc9c #16a085 #f1c40f #f39c12 #7f8c8d #f1948a #85c1e9'.split(' ')
+    FPR = FuelPriceReading
+    for idx, station in enumerate(stations):
+        data = []
+        q = FPR.query.filter(FPR.station_id == station.id, FPR.when < limit).order_by(FPR.when.asc())
+        for reading in q.all():
+            data.append({'x': reading.when.strftime( "%Y-%m-%dT%H:%M:%SZ"), 'y': reading.price_per_g})
+        if data:
+            datasets.append({
+                'label': station.name,
+                'data': data,
+                'borderColor': colors[idx],
+            })
+    ctx = {
+        'system': system,
+        'datasets': json.dumps(datasets),
+        'systems': System.query.all()
+    }
+    return render_template('system_fuel_price.html', **ctx)

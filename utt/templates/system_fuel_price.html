@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}{{ system.name }} Fuel Prices{% endblock %}
+{% block content %}
+    <ul class="subnav">
+        <li><strong>System</strong></li>
+        {% for system in systems %}
+            <li><a href="{{url_for('system_fuel_price', id=system.id )}}">{{ system.name }}</a></li>
+        {% endfor %}
+    </ul>
+
+    <h1>{{ system.name }} Fuel Prices</h1>
+
+    <canvas id="myChart" width="600" height="300"></canvas>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.3"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.js"></script>
+
+    <script>
+        var datasets = {{ datasets | safe }};
+        datasets.forEach(function (dataset, idx) {
+            dataset.data.forEach(function (elem, idx) {
+                elem.x = new Date(elem.x);
+            });
+        });
+
+        window.onload = function () {
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: datasets
+                },
+                options: {
+                    fill: false,
+                    cubicInterpolationMode: false,
+                    lineTension: 0,
+                    plugins: {
+                        annotation: {
+                            annotations: [{
+                                id: 'update-2019-10-15',
+                                type: 'line',
+                                mode: 'vertical',
+                                scaleID: 'x-axis-0',
+                                value: new Date('2019-10-15'),
+                                borderColor: 'red',
+                                borderWidth: 3,
+                                label: {
+                                    content: "Game update 2019-10-15",
+                                },
+                            }]
+                        },
+                        zoom: {
+                            pan: {
+                                enabled: true,
+                                mode: 'x',
+                                drag: true,
+                            },
+                        },
+                    },
+                    scales: {
+                        xAxes: [{
+                            type: 'time',
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: false
+                            }
+                        }]
+                    }
+                }
+            })
+        };
+    </script>
+{% endblock %}

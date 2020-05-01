@@ -181,7 +181,8 @@ class FuelPriceReading(db.Model):
     price_per_g = db.Column(db.Float, nullable=False)
 
 class FuelPriceStatistics(db.Model):
-    station_id = db.Column(db.Integer, primary_key=True)
+    station_id = db.Column(db.ForeignKey('station.id'), primary_key=True, )
+    station = db.relationship('Station')
     station_name = db.Column(db.String(255), nullable=False)
     station_short_name = db.Column(db.String(255))
     station_level = db.Column(db.Integer)
