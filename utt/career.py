@@ -147,14 +147,9 @@ def career_station_needs_update(system, station):
     except AssertionError:
         return jsonify({'needs_update': True})
         
-    newest = CareerBatchSubmission.query.filter_by(station_id=st.id) \
+    existing = CareerBatchSubmission.query.filter(CareerBatchSubmission.when > today_datetime()).filter_by(station_id=st.id) \
              .order_by(CareerBatchSubmission.when.desc()).first()
-    
-    if newest is None:
-        result = True
-    else:
-        delta = now() - newest.when
-        result = delta.total_seconds() > 4 * 3600
+    result = existing is None
 
     return jsonify({'needs_update': result})
 
@@ -168,7 +163,7 @@ def career_overview():
 def system_career_graph(id):
     system = System.query.filter_by(id=id).one()
     stations = system.stations
-    limit = now() - timedelta(days=1)
+    limit = today_datetime()
     datasets = []
     CBS = CareerBatchSubmission
     # colors from https://htmlcolorcodes.com/color-chart/
