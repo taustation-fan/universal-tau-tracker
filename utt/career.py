@@ -6,6 +6,7 @@ from flask import request, jsonify, Response, render_template
 from sqlalchemy import func
 
 from .app import app
+from utt.util import today_datetime
 
 from utt.model import db, \
                       get_station, \
@@ -81,13 +82,16 @@ def career_task_add():
     response['factor'] = factor
 
     # find factors for other stations in the system
-    date_limit = now() - timedelta(hours=6)
+    date_limit = today_datetime()
     stations = Station.query.filter_by(system_id=station.system_id)
     system_factors = {}
+
+    cbs = CareerBatchSubmission
     for st in stations.all():
         if st.name == station_name:
             continue
-        bs = CareerBatchSubmission.query.filter_by(station_id=st.id).order_by(CareerBatchSubmission.when.desc()).first()
+        qry = cbs.query.filter(cbs.when > date_limit).filter_by(station_id=st.id).order_by(cbs.when.desc())
+        bs = qry.first()
         if bs:
             factor = max(o.factor for o in bs.readings)
             system_factors[st.name] = factor
