@@ -125,6 +125,24 @@ def fuel_lowest(token):
     
     return render_template('fuel_refuel.html', rows=rows)
 
+@app.route('/fuel/stats/<token>.json')
+def fuel_stats_json(token):
+    token = Token.query.filter_by(token=token).first()
+    assert token, 'Need valid token'
+    n = now()
+    
+    refuel = FPS.query.order_by(FPS.last_price.asc())
+    rows = [{
+                'station_short_name': r.station_short_name,
+                'last_price': r.last_price,
+                'last_reading': r.last_reading.isoformat(),
+                'station_name': r.station_name,
+                'system_name': r.system_name,
+                'min_price': r.min_price,
+                'max_price': r.max_price,
+             } for r in refuel]
+    return jsonify({'stations': rows})
+
 @app.route('/fuel/system/<id>')
 def system_fuel_price(id):
     system = System.query.filter_by(id=id).one()
