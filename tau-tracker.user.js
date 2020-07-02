@@ -1,10 +1,9 @@
 // ==UserScript==
-// @name         Tau Station Universal Tracker
-// @version      1.1
+// @name         Ta Station Universal Tracker
+// @version      1.3
 // @author       Moritz Lenz <moritz.lenz@gmail.com>
 // @description  General data collection script for Tau Station. Please get an access token from moritz and add it in your preferences page.
-// @match        https://alpha.taustation.space/
-// @match        https://alpha.taustation.space/*
+// @match        https://taustation.space/*
 // @require      https://code.jquery.com/jquery-3.3.1.min.js
 // @require      https://rawgit.com/taustation-fan/userscripts/master/userscript-preferences.js
 // @downloadURL  https://github.com/taustation-fan/universal-tau-tracker/raw/master/tau-tracker.user.js

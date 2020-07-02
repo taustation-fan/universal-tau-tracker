@@ -22,9 +22,9 @@ A [game update in June 2019](https://blog.taustation.space/blog/update-changelog
 It seems there is a baseline bonus (9 credits for the lowest-paying task of most careers), and an additional factor between 1 and 2 that varies by station and time. The variation is on the order of hours to days.
 
 This repository provides tooling to automatically record career task bonuses
-during normal game play, conforming to the [Tau Station Terms of Service](https://alpha.taustation.space/terms). In addition, it shows you the factors of other stations within the same system, provided up-to-date data is available.
+during normal game play, conforming to the [Tau Station Terms of Service](https://taustation.space/terms). In addition, it shows you the factors of other stations within the same system, provided up-to-date data is available.
 
-After an [initial setup](#setup), simply navigate to the [list of career tasks](https://alpha.taustation.space/career). A userscript automatically extracts data from this page and submits it to a central server.
+After an [initial setup](#setup), simply navigate to the [list of career tasks](https://taustation.space/career). A userscript automatically extracts data from this page and submits it to a central server.
 
 The submitted data will be used to gain a better understanding of the career task bonus mechanics. Any general findings will be published in the [Tau Guide](https://tauguide.de/).
 
@@ -34,14 +34,14 @@ The submitted data will be used to gain a better understanding of the career tas
 
 Space Stations in Tau Station [orbit a central body](https://tauguide.de/orbital-mechanics).
 
-If you visit the [Local Shuttles page](https://alpha.taustation.space/travel/area/local-shuttles), the userscript will automatically record the distances between stations, which helps us to reverse engineer orbital parameters, such as radius and orbital period.
+If you visit the [Local Shuttles page](https://taustation.space/travel/area/local-shuttles), the userscript will automatically record the distances between stations, which helps us to reverse engineer orbital parameters, such as radius and orbital period.
 
 [This page](https://tracker.tauguide.de/distance) visualizes station distances over time.
 
 ### Fuel Prices
 
 The [October 2019 update](https://blog.taustation.space/blog/update-changelog-2019-oct-15/) introduced variable fuel prices.
-When you visit [the docks](https://alpha.taustation.space/area/docks) and have a private ship there (but aren't inside the cockpit),
+When you visit [the docks](https://taustation.space/area/docks) and have a private ship there (but aren't inside the cockpit),
 the userscript automatically records the current station's fuel price per gram, and gives you an overview of current fuel prices.
 
 In addition, a [public page](https://tracker.tauguide.de/fuel) gives an overview of fuel price ranges observed per station.
@@ -53,12 +53,12 @@ In addition, a [public page](https://tracker.tauguide.de/fuel) gives an overview
 As a user, you need to follow the following steps to submit data to the career task tracker:
 
 * Install a browser extension that allows you to run userscripts, for example [Tampermonkey](https://www.tampermonkey.net/) or [Greasemonkey](https://www.greasespot.net/).
-* Request an access token from [moritz via in-game mail](https://alpha.taustation.space/email/write/moritz)
+* Request an access token from [moritz via in-game mail](https://taustation.space/email/write/moritz)
 * Install the [`tau_tracker.user.js` userscript](https://github.com/taustation-fan/universal-tau-tracker/raw/master/tau-tracker.user.js).
-* Navigate to [Preferences](https://alpha.taustation.space/preferences) and enter your access token under *UserScript: Career Task Tracker*.
+* Navigate to [Preferences](https://taustation.space/preferences) and enter your access token under *UserScript: Career Task Tracker*.
 
 After this setup, you'll automatically submit career task data when you
-view the [list of career tasks](https://alpha.taustation.space/career), and shuttle data when you visit [local shuttles](https://alpha.taustation.space/travel/area/local-shuttles).
+view the [list of career tasks](https://taustation.space/career), and shuttle data when you visit [local shuttles](https://taustation.space/travel/area/local-shuttles).
 
 ## Development
 
