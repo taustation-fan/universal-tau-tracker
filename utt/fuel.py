@@ -64,18 +64,33 @@ def fuel_add():
 
 def render_fuel_add_response(current_station, token):
     start_dt = now()
-    reference_date = start_dt - timedelta(hours=8)
+    reference_date = today_datetime()
     rows = []
+
+    seen = set()
 
     for stat in FPS.query.filter(FPS.last_reading >= reference_date).order_by(FPS.last_price, FPS.station_name):
         station_name = stat.station_short_name or stat.station_name
+        seen.add(station_name)
         diff = start_dt - stat.last_reading
         rows.append({
             'station_name': station_name,
             'is_current':   stat.station_id == current_station.id,
-            'price_per_g':  '{:.1f}'.format(stat.last_price),
+            'price_per_g':  stat.last_price,
             'age': gct_duration(start_dt - stat.last_reading),
         })
+    # add estimations
+    estimations = [e for e in FuelPriceEstimation.all_today() if e.station.short not in seen]
+    for e in estimations:
+        rows.append({
+            'station_name': e.station.short,
+            'is_current': False,
+            'price_per_g': e.price_per_g,
+            'age': '(est.)',
+        })
+    print(rows)
+    rows.sort(key=lambda e: e['price_per_g'])
+    
     return str(render_template('fuel_short_table.html', rows=rows, token=token))
 
 @app.route('/fuel')
