@@ -8,7 +8,7 @@ from flask import request, jsonify, Response, render_template, send_file
 from sqlalchemy import func
 
 from .app import app
-from utt.util import today_datetime
+from utt.util import today_datetime, today
 
 from utt.model import db, \
                       get_station, \
@@ -110,6 +110,28 @@ def fuel_min_max_png():
     img.seek(0)
     return send_file(img, mimetype='image/png')
 
+@app.route('/fuel/stats/<token>.json')
+def fuel_stats_json(token):
+    token = Token.query.filter_by(token=token).first()
+    assert token, 'Need valid token'
+    n = now()
+
+    estimations = FuelPriceEstimation.today_as_dict()
+    
+
+    refuel = FPS.query.order_by(FPS.last_price.asc())
+    rows = [{
+                'station_short_name': r.station_short_name,
+                'last_price': r.last_price,
+                'estimation': estimations.get(r.station_short_name),
+                'last_reading': r.last_reading.isoformat(),
+                'station_name': r.station_name,
+                'system_name': r.system_name,
+                'min_price': r.min_price,
+                'max_price': r.max_price,
+             } for r in refuel]
+    return jsonify({'stations': rows})
+
 @app.route('/fuel/lowest/<token>')
 def fuel_lowest(token):
     token = Token.query.filter_by(token=token).first()
@@ -120,38 +142,19 @@ def fuel_lowest(token):
     refuel = FPS.query.filter(FPS.last_reading > limit).order_by(FPS.last_price.asc())
     measured = {r.station_short_name: r.last_price for r in refuel}
 
-    estimations = FuelPriceEstimation.query.order_by(FuelPriceEstimation.price_per_g.asc())
-    estimation_by_short = {e.station.short: e.price_per_g for e in estimations}
+    estimations = FuelPriceEstimation.today_as_dict()
 
-    all_short_names = set(estimation_by_short.keys()) | set(measured.keys())
+    all_short_names = set(estimations.keys()) | set(measured.keys())
 
     rows = [{
                 'station_short_name': short,
                 'last_price': measured.get(short),
-                'estimated_price': estimation_by_short.get(short), 
+                'estimated_price': estimations.get(short), 
              } for short in all_short_names]
     rows.sort(key=lambda r: r['last_price'] or r['estimated_price'])
 
     
     return render_template('fuel_refuel.html', rows=rows)
-
-@app.route('/fuel/stats/<token>.json')
-def fuel_stats_json(token):
-    token = Token.query.filter_by(token=token).first()
-    assert token, 'Need valid token'
-    n = now()
-    
-    refuel = FPS.query.order_by(FPS.last_price.asc())
-    rows = [{
-                'station_short_name': r.station_short_name,
-                'last_price': r.last_price,
-                'last_reading': r.last_reading.isoformat(),
-                'station_name': r.station_name,
-                'system_name': r.system_name,
-                'min_price': r.min_price,
-                'max_price': r.max_price,
-             } for r in refuel]
-    return jsonify({'stations': rows})
 
 @app.route('/fuel/system/<id>')
 def system_fuel_price(id):

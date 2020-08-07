@@ -2,6 +2,7 @@ from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
+from utt.util import today
 
 db = SQLAlchemy()
 
@@ -186,6 +187,14 @@ class FuelPriceEstimation(db.Model):
     station = db.relationship('Station')
     day = db.Column(db.Date, nullable=False)
     price_per_g = db.Column(db.Float, nullable=False)
+
+    @classmethod
+    def all_today(cls):
+        return cls.query.filter(cls.day == today()).order_by(cls.price_per_g.asc())
+
+    @classmethod
+    def today_as_dict(cls):
+        return {e.station.short: e.price_per_g for e in cls.all_today()}
 
 class FuelPriceStatistics(db.Model):
     station_id = db.Column(db.ForeignKey('station.id'), primary_key=True, )
