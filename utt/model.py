@@ -180,6 +180,13 @@ class FuelPriceReading(db.Model):
     price = db.Column(db.Float, nullable=False)
     price_per_g = db.Column(db.Float, nullable=False)
 
+class FuelPriceEstimation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    station_id = db.Column(db.ForeignKey('station.id'), nullable=False)
+    station = db.relationship('Station')
+    day = db.Column(db.Date, nullable=False)
+    price_per_g = db.Column(db.Float, nullable=False)
+
 class FuelPriceStatistics(db.Model):
     station_id = db.Column(db.ForeignKey('station.id'), primary_key=True, )
     station = db.relationship('Station')

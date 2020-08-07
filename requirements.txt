@@ -5,3 +5,6 @@ psycopg2
 pytz
 matplotlib
 numpy
+requests
+bs4
+lxml
