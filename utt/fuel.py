@@ -13,6 +13,7 @@ from utt.util import today_datetime
 from utt.model import db, \
                       get_station, \
                       Token, \
+                      FuelPriceEstimation, \
                       FuelPriceReading, \
                       FuelPriceStatistics as FPS, \
                       System
@@ -114,13 +115,22 @@ def fuel_lowest(token):
     token = Token.query.filter_by(token=token).first()
     assert token, 'Need valid token'
     n = now()
+    limit = today_datetime()
     
-    refuel = FPS.query.order_by(FPS.last_price.asc()).limit(15)
+    refuel = FPS.query.filter(FPS.last_reading > limit).order_by(FPS.last_price.asc())
+    measured = {r.station_short_name: r.last_price for r in refuel}
+
+    estimations = FuelPriceEstimation.query.order_by(FuelPriceEstimation.price_per_g.asc())
+    estimation_by_short = {e.station.short: e.price_per_g for e in estimations}
+
+    all_short_names = set(estimation_by_short.keys()) | set(measured.keys())
+
     rows = [{
-                'station_short_name': r.station_short_name,
-                'last_price': r.last_price,
-                'age_gct':  gct_duration(n - r.last_reading),
-             } for r in refuel]
+                'station_short_name': short,
+                'last_price': measured.get(short),
+                'estimated_price': estimation_by_short.get(short), 
+             } for short in all_short_names]
+    rows.sort(key=lambda r: r['last_price'] or r['estimated_price'])
 
     
     return render_template('fuel_refuel.html', rows=rows)

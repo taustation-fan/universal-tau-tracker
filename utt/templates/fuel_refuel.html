@@ -8,16 +8,16 @@
     <thead>
         <tr>
             <th>Station</th>
-            <th class="right">Last Price c/gram</th>
-            <th>Age</th>
+            <th class="right">Measured <br>fuel price<br>c/gram</th>
+            <th class="right">Estimated <br>fuel price<br>c/gram</th>
         </tr>
     </thead>
     <tbody>
         {% for row in rows %}
             <tr>
                 <td>{{ row.station_short_name }}</td>
-                <td class="right">{{ row.last_price | round(1) }}</td>
-                <td>{{ row.age_gct }}</td>
+                <td class="right">{% if row.last_price%}{{ row.last_price | round(1) }}{% endif %}</td>
+                <td class="right">{% if row.estimated_price%}{{ row.estimated_price | round(1) }}{% endif %}</td>
             </tr>
         {% endfor %}
     </tbody>
