@@ -1,10 +1,16 @@
 from datetime import datetime
+from sqlalchemy.orm.exc import NoResultFound
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
 from utt.util import today
 
 db = SQLAlchemy()
+
+class InvalidTokenException(Exception):
+    def __init__():
+        super().__init__('You need a valid token')
+        
 
 def get_station(system_name, station_name, create=True):
     system = System.query.filter(func.lower(System.name)==system_name.lower()).first()
@@ -54,6 +60,14 @@ class Token(db.Model):
     character_id = db.Column(db.ForeignKey('character.id'), nullable=False)
     character = db.relationship('Character', backref=db.backref('tokens', lazy=True))
     full_read_permission = db.Column(db.Boolean(), nullable=False, default=False)
+
+    @classmethod
+    def verify(cls, token):
+        try:
+            return cls.query.filter_by(token=token).one()
+        except NoResultFound:
+            raise InvalidTokenException()
+            
 
 ## Career task bonus tracking
 class CareerBatchSubmission(db.Model):
@@ -208,3 +222,46 @@ class FuelPriceStatistics(db.Model):
     min_price = db.Column(db.Float, nullable=False)
     max_price = db.Column(db.Float, nullable=False)
     last_price = db.Column(db.Float, nullable=False)
+
+
+class ShipClass(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(), unique=True, nullable=False)
+
+    key = 'name'
+    
+class Ship(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    registration = db.Column(db.String(), nullable=False, unique=True)
+    name = db.Column(db.String(), nullable=False)
+    captain = db.Column(db.String(), nullable=False)
+    ship_class_id = db.Column(db.ForeignKey('ship_class.id'), nullable=False)
+    ship_class = db.relationship('ShipClass')
+
+    key = 'registration'
+
+class ShipSighting(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    ship_id = db.Column(db.ForeignKey('ship.id'), nullable=False)
+    ship = db.relationship('Ship')
+    station_id = db.Column(db.ForeignKey('station.id'), nullable=False)
+    station = db.relationship('Station')
+    when = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.utcnow)
+    token_id = db.Column(db.ForeignKey('token.id'), nullable=False)
+    token = db.relationship('Token')
+
+def autovivify(model, attrs):
+    """
+    Tries to look up if an object matching the attributes in dict `attrs` exist.
+    If not, creates and returns a new object.
+    """
+    key_col = model.key
+    key_val = attrs[key_col]
+    
+    try:
+        return model.query.filter(getattr(model, key_col) == key_val).one()
+    except NoResultFound:
+        pass
+    new = model(**attrs)
+    db.session.add(new)
+    return new
