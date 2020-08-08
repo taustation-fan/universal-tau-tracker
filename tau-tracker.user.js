@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Ta Station Universal Tracker
-// @version      1.3
+// @version      1.4
 // @author       Moritz Lenz <moritz.lenz@gmail.com>
 // @description  General data collection script for Tau Station. Please get an access token from moritz and add it in your preferences page.
 // @match        https://taustation.space/*
@@ -337,6 +337,7 @@ function extract_docks_cockpit(token, options, station) {
 
 function extract_docks_fuel(token, options, station) {
     let url = options.base_url + 'v1/fuel/add';
+    let prices = [];
     $('div.own-ship-details').each(function() {
         var $ship = $( this );
         var $meter = $ship.find('.ship-state').find('div:contains("Fuel:")').find('.meter');
@@ -346,32 +347,43 @@ function extract_docks_fuel(token, options, station) {
         if (!fuel_g) return;
         var price = parseFloat($ship.find('a:contains(Refuel)').find('.currency-amount').text())
         if (!price) return;
-
-        var payload = {
-            token: token,
-            station: station.station,
-            system: station.system,
-            fuel_g: fuel_g,
+        prices.push({
             price: price,
-        };
-        $.ajax({
-            type: "POST",
-            url: url,
-            dataType: 'json',
-            data: JSON.stringify(payload),
-            success: function(response) {
-                if (response.recorded) {
-                    let message = 'Fuel price recorded. +1 brownie point!<br>' + response.message;
-                    utt_add_message(message);
-                }
-                else {
-                    utt_add_message('error recording fuel price: ' + response.message, 'orange');
-                }
-            },
-            error: function(xhr) {
-                utt_add_message('cannot talk to ' + url + ': ' + xhr.response_text, 'orange');
-            },
+            fuel_g: fuel_g,
         });
+    });
+    if (!prices.length)
+        return;
+
+    prices.sort(function (a, b) {
+        b.fuel_g - a.fuel_g;
+    });
+    const p = prices[0];
+
+    var payload = {
+        token: token,
+        station: station.station,
+        system: station.system,
+        fuel_g: p.fuel_g,
+        price: p.price,
+    };
+    $.ajax({
+        type: "POST",
+        url: url,
+        dataType: 'json',
+        data: JSON.stringify(payload),
+        success: function(response) {
+            if (response.recorded) {
+                let message = 'Fuel price recorded. +1 brownie point!<br>' + response.message;
+                utt_add_message(message);
+            }
+            else {
+                utt_add_message('error recording fuel price: ' + response.message, 'orange');
+            }
+        },
+        error: function(xhr) {
+            utt_add_message('cannot talk to ' + url + ': ' + xhr.response_text, 'orange');
+        },
     });
 }
 
