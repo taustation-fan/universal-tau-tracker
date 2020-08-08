@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Ta Station Universal Tracker
-// @version      1.6
+// @version      1.7
 // @author       Moritz Lenz <moritz.lenz@gmail.com>
 // @description  General data collection script for Tau Station. Please get an access token from moritz and add it in your preferences page.
 // @match        https://taustation.space/*
@@ -197,7 +197,6 @@ function record_career_tasks(options, station) {
                         body += '<tr><td>' + station + '</td><td>' + format_float(factor)  + '</td></tr>\n';
                     }
                     let table = '<table>' + thead + '<tbody>' + body + '</tbody></table>';
-                    console.log(table);
                     message += '</p><p>Other stations in this system:</p>' + table;
                 }
                 else {
@@ -272,6 +271,7 @@ function extract_local_shuttles(options, station) {
 }
 function get_ships() {
     const ships = [];
+    const character = $('.avatar-links--item--player').text().replace(/\s+.*/, '');
 
     // Own ships
     $('div.own-ships-container h3 button').each(function() {
@@ -281,7 +281,7 @@ function get_ships() {
         const registration = $ship.attr('aria-controls').replace('ship-', '');
         ships.push({
             name: name,
-            captain: Core.character.name,
+            captain: character,
             registration: registration,
             class: ship_class,
         });
