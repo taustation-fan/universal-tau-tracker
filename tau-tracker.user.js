@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Ta Station Universal Tracker
-// @version      1.4
+// @version      1.5
 // @author       Moritz Lenz <moritz.lenz@gmail.com>
 // @description  General data collection script for Tau Station. Please get an access token from moritz and add it in your preferences page.
 // @match        https://taustation.space/*
@@ -270,6 +270,82 @@ function extract_local_shuttles(options, station) {
         },
     });
 }
+function get_ships() {
+    const ships = [];
+
+    // Own ships
+    $('div.own-ships-container h3 button').each(function() {
+        const $ship = $(this);
+        const name = $ship.find('span.name').text();
+        const ship_class = $ship.find('span.class').text();
+        const registration = $ship.attr('aria-controls').replace('ship-', '');
+        ships.push({
+            name: name,
+            captain: Core.character.name,
+            registration: registration,
+            class: ship_class,
+        });
+    });
+
+    // Other's ships
+    $('.ticket-schedule-row').each(function() {
+        var $ship = $( this );
+        if ($ship.find('.ticket-col-head').length) {
+            return;
+        }
+        const ship_name = $ship.find('.docked-ships-col-name').find('dd').text();
+        if (ship_name === null)
+            return;
+        const captain_name = $ship.find('.docked-ships-col-captain').find('a').text();
+
+        const $details = $ship.parent('ul').next();
+        const details = {}
+        $details.find('.ship-state').find('div').each(function () {
+            var $d = $( this );
+            var name = $d.find('dt').text().replace(':', '');
+            var value = $d.find('dd').text();
+            details[name] = value;
+        });
+        ships.push({
+            name: ship_name,
+            captain: captain_name,
+            registration: details['Registration'],
+            class: details['Class'],
+        })
+
+    });
+    return ships;
+}
+
+function extract_docks_ships(token, options, station) {
+    const ships = get_ships();
+    const payload = {
+        token: token,
+        station: station.station,
+        system: station.system,
+        ships: ships,
+    }
+    let url = options.base_url + 'v1/ship/add';
+
+    $.ajax({
+        type: "POST",
+        url: url,
+        dataType: 'json',
+        data: JSON.stringify(payload),
+        success: function(response) {
+            if (response.success) {
+                if (response.message)
+                    utt_add_message(response.message);
+            }
+            else if (response.meessage) {
+                utt_add_message('error recording ships: ' + response.message, 'orange');
+            }
+        },
+        error: function(xhr) {
+            utt_add_message('cannot talk to ' + url + ': ' + xhr.response_text, 'orange');
+        },
+    });
+}
 
 function extract_docks(options, station) {
     var token = options.token;
@@ -282,6 +358,7 @@ function extract_docks(options, station) {
     }
     else {
         extract_docks_fuel(token, options, station);
+        extract_docks_ships(token, options, station);
     }
 }
 
