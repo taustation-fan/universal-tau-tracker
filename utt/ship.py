@@ -41,6 +41,6 @@ def ship_add():
 
 @app.route('/ship/')
 def ship_overview():
-    ships = Ship.query.order_by(Ship.name.asc())
+    ships = Ship.query.order_by(Ship.captain.asc(), Ship.name.asc())
 
     return render_template('ship/overview.html', ships=ships)
