@@ -36,6 +36,7 @@ def ship_add():
         ))
         count += 1
     db.session.commit()
+    print('Recorded {} ship positions on {} by {}'.format(count, station.name, token.character.name))
     return jsonify({'success': True, 'num_recorded': count})
 
 @app.route('/ship/')
