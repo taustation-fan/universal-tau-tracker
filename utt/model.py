@@ -240,6 +240,10 @@ class Ship(db.Model):
 
     key = 'registration'
 
+    @property
+    def last_sighting(self):
+        return ShipSighting.query.filter_by(ship_id=self.id).order_by(ShipSighting.when.desc()).first()
+
 class ShipSighting(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     ship_id = db.Column(db.ForeignKey('ship.id'), nullable=False)

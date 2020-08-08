@@ -9,6 +9,7 @@
             <th>Captain</th>
             <th>Registration</th>
             <th>Class</th>
+            <th>Last Seen</th>
         </tr>
     </thead>
     <tbody>
@@ -18,6 +19,8 @@
                 <td>{{ ship.captain | escape }}</td>
                 <td>{{ ship.registration | escape }}</td>
                 <td>{{ ship.ship_class.name | escape }}</td>
+                <td>{% set last_seen = ship.last_sighting %}
+                    {% if last_seen %}{{ last_seen.station.short }}{% endif %}</td>
 
             </tr>
 
