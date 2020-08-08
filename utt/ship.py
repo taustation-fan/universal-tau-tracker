@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from sqlalchemy.orm.exc import NoResultFound
-from flask import request, jsonify
+from flask import request, jsonify, render_template
 
 from utt.app import app
 from utt.model import db, \
@@ -37,3 +37,9 @@ def ship_add():
         count += 1
     db.session.commit()
     return jsonify({'success': True, 'num_recorded': count})
+
+@app.route('/ship/')
+def ship_overview():
+    ships = Ship.query.order_by(Ship.name.asc())
+
+    return render_template('ship/overview.html', ships=ships)
