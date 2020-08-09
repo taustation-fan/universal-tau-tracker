@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Tau Station: {{ ship.name|escape }} in the Ship Registry{% endblock %}
+{% block content %}
+
+<h2 id="details">Ship Details</h2>
+
+<table>
+    <tbody>
+        <tr>
+            <th class="right">Name<th>
+            <td>{{ ship.name | escape }}</td>
+        </tr>
+        <tr>
+            <th class="right">Captain<th>
+            <td>{{ ship.captain | escape }}</td>
+        </tr>
+        <tr>
+            <th class="right">Registration<th>
+            <td>{{ ship.registration | escape }}</td>
+        </tr>
+        <tr>
+            <th class="right">Class<th>
+            <td>{{ ship.ship_class.name | escape }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2 id="sightings">Sightings</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Station</th>
+            <th># sightings</th>
+            <th>first seen</th>
+            <th>last seen</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for s in ship.sighting_streaks %}
+            <tr>
+                <td>{{ s.station.short|escape }}</td>
+                <td>{{ s.sightings|length }}</td>
+                <td>{{ format_datetime(s.first.when) }}</td>
+                <td>{{ format_datetime(s.last.when) }}</td>
+            </tr>
+
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock %}
+

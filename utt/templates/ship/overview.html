@@ -17,7 +17,7 @@
     <tbody>
         {% for ship in ships %}
             <tr>
-                <td>{{ ship.name | escape }}</td>
+                <td><a href="/ship/{{ship.registration|escape}}">{{ ship.name | escape }}</a></td>
                 <td>{{ ship.captain | escape }}</td>
                 <td>{{ ship.registration | escape }}</td>
                 <td>{{ ship.ship_class.name | escape }}</td>

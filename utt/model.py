@@ -237,12 +237,49 @@ class Ship(db.Model):
     captain = db.Column(db.String(), nullable=False)
     ship_class_id = db.Column(db.ForeignKey('ship_class.id'), nullable=False)
     ship_class = db.relationship('ShipClass')
+    sightings = db.relationship('ShipSighting', order_by='asc(ShipSighting.when)')
 
     key = 'registration'
 
     @property
     def last_sighting(self):
         return ShipSighting.query.filter_by(ship_id=self.id).order_by(ShipSighting.when.desc()).first()
+
+    @property
+    def sighting_streaks(self):
+        streaks = []
+        current = []
+        for s in self.sightings:
+            if not current:
+                pass
+            elif current[-1].station_id != s.station_id:
+                streaks.append(ShipSightingStreak(current))
+                current = []
+            current.append(s)
+        if current:
+            streaks.append(ShipSightingStreak(current))
+        return streaks
+
+class ShipSightingStreak:
+    def __init__(self, sightings):
+        assert len(sightings) > 0, 'Empty streak makes no sense'
+        self.sightings = sightings
+
+    @property
+    def station(self):
+        return self.sightings[0].station
+
+    @property
+    def ship(self):
+        return self.sightings[0].ship
+
+    @property
+    def first(self):
+        return self.sightings[0]
+        
+    @property
+    def last(self):
+        return self.sightings[-1]
 
 class ShipSighting(db.Model):
     id = db.Column(db.Integer, primary_key=True)
