@@ -122,7 +122,17 @@ def distance_pair(id):
     readings = []
     sdr_m = StationDistanceReading
     pair = StationPair.query.filter_by(id=id).one()
-    for r in sdr_m.query.filter_by(station_pair_id=id).order_by(StationDistanceReading.when).all():
+    limit_days = None
+    query = sdr_m.query.filter_by(station_pair_id=id)
+    if pair.fit_period_u:
+        limit_days = math.ceil(8 * math.ceil(pair.fit_period_u / 100e3 * 5) / 5)
+
+        latest = query.order_by(sdr_m.when.desc()).first()
+        if latest:
+            limit_qry = latest.when - timedelta(days=limit_days)
+            query = query.filter(sdr_m.when >= limit_qry)
+        
+    for r in query.order_by(sdr_m.when).all():
         readings.append({'x': r.when.astimezone(pytz.UTC).strftime( "%Y-%m-%dT%H:%M:%SZ"), 'y': r.distance_km})
 
     min_distance, max_distance = None, None
@@ -142,6 +152,7 @@ def distance_pair(id):
         'max_distance': max_distance,
         'has_prediction': pair.has_full_fit,
         'fit_period_u': pair.fit_period_u and gct_duration(int(pair.fit_period_u * 0.864)),
+        'limit_days': limit_days,
     }
     if request.content_type == 'application/json':
         return jsonify(result)

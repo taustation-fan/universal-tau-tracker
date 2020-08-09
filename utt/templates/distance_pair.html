@@ -14,6 +14,10 @@
     <p>The relative period is {{ fit_period_u }}.</p>
     {% endif %}
 
+    {% if limit_days %}
+        <p>Showing at most {{ limit_days }} days of data.</p>
+    {% endif %}
+
     <p><a href="{{ url_for('distance_pair_csv', id=id) }}">Download as CSV.</a></p>
 
     {% if has_prediction %}
