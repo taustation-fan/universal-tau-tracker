@@ -41,6 +41,10 @@ def is_close(a,b):
     tolerance = 0.02
     return abs(a/b - 1.0) < tolerance
 
+def is_closer(a, b, c):
+    """Returns true if number b is numerically closer to a than C is to be. """
+    return abs(a - b) < abs(a - c)
+
 
 def run_strategy(strat, fuel_prices):
     station = strat['Station']
@@ -68,7 +72,7 @@ def run_strategy(strat, fuel_prices):
         if verbose:
             print("%s  comparing with %s with fpc=%.5f, estimated price %.2f"
                 % (blank, other_station, other_fpc, itemprice_other))
-        if is_close(itemprice_other, itemprice_min):
+        if is_closer(itemprice_other, itemprice_min, itemprice_max) and is_close(itemprice_other, itemprice_min):
             itemprice = itemprice_max
             if verbose:
                 print("%s  other station's price matches minimum => price=%.2f => fuelprice=%.2f"
