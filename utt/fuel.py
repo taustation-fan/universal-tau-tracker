@@ -88,7 +88,6 @@ def render_fuel_add_response(current_station, token):
             'price_per_g': e.price_per_g,
             'age': '(est.)',
         })
-    print(rows)
     rows.sort(key=lambda e: e['price_per_g'])
     
     return str(render_template('fuel_short_table.html', rows=rows, token=token))
