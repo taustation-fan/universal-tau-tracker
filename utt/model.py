@@ -247,6 +247,9 @@ class Ship(db.Model):
 
     @property
     def sighting_streaks(self):
+        cached = getattr(self, '_sighting_streaks', None)
+        if cached is not None:
+            return cached
         streaks = []
         current = []
         for s in self.sightings:
@@ -258,7 +261,27 @@ class Ship(db.Model):
             current.append(s)
         if current:
             streaks.append(ShipSightingStreak(current))
+        self._sighting_streaks = streaks
         return streaks
+
+    @property
+    def min_jumps(self):
+        ss = self.sighting_streaks
+        if not ss:
+            return 0
+        c = 0
+        previous_system_id = ss[0].station.system_id
+        for streak in ss[1:]:
+            if streak.station.system_id != previous_system_id:
+                c += 1
+                previous_system_id = streak.station.system_id
+        return c
+
+    @property
+    def siblings(self):
+        return Ship.query.filter(Ship.captain == self.captain, Ship.id != self.id)
+    
+
 
 class ShipSightingStreak:
     def __init__(self, sightings):

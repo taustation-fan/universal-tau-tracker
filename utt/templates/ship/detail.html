@@ -25,6 +25,17 @@
     </tbody>
 </table>
 
+
+{% if ship.siblings.count() %}
+<h2 id="siblings">Other ships by the same captain</h2>
+<ul>
+{% for sibling in ship.siblings %}
+    <li><a href="/ship/{{ sibling.registration | escape }}">{{ sibling.name }} ({{sibling.ship_class.name}})</a></li>
+{% endfor %}
+</ul>
+
+{% endif %}
+
 <h2 id="sightings">Sightings</h2>
 
 <table>
@@ -47,6 +58,12 @@
         {% endfor %}
     </tbody>
 </table>
+
+{% set min_jumps = ship.min_jumps %}
+{% if min_jumps %}
+    <p>Observed interstellar jumps: {{ min_jumps }}.</p>
+{% endif %}
+
 
 {% endblock %}
 
