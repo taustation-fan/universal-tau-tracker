@@ -28,7 +28,7 @@
 
 {% if ship.siblings.count() %}
 <h2 id="siblings">Other ships by the same captain</h2>
-<ul>
+<ul class="ship-list">
 {% for sibling in ship.siblings %}
     <li><a href="/ship/{{ sibling.registration | escape }}">{{ sibling.name }} ({{sibling.ship_class.name}})</a></li>
 {% endfor %}

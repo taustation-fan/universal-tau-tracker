@@ -57,3 +57,9 @@ ul.subnav li {
 #ships {
     max-width: 60em;
 }
+
+.ship-list {
+    list-style: "🚀 ";
+    list-style-position: outside;
+}
+
