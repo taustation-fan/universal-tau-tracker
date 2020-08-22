@@ -150,6 +150,7 @@ def fuel_stats_json(token):
 def fuel_lowest(token):
     token = Token.query.filter_by(token=token).first()
     assert token, 'Need valid token'
+    compare = bool(request.args.get('cmp', False))
     n = now()
     limit = today_datetime()
     
@@ -167,8 +168,7 @@ def fuel_lowest(token):
              } for short in all_short_names]
     rows.sort(key=lambda r: r['last_price'] or r['estimated_price'])
 
-    
-    return render_template('fuel_refuel.html', rows=rows)
+    return render_template('fuel_refuel.html', rows=rows, compare=compare)
 
 @app.route('/fuel/system/<id>')
 def system_fuel_price(id):

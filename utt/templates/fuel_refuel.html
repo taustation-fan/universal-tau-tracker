@@ -10,6 +10,9 @@
             <th>Station</th>
             <th class="right">Measured <br>fuel price<br>c/gram</th>
             <th class="right">Estimated <br>fuel price<br>c/gram</th>
+            {% if compare %}
+                <th class="right">Estimation<br>error (‰)</th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -18,6 +21,13 @@
                 <td>{{ row.station_short_name }}</td>
                 <td class="right">{% if row.last_price%}{{ row.last_price | round(1) }}{% endif %}</td>
                 <td class="right">{% if row.estimated_price%}{{ row.estimated_price | round(1) }}{% endif %}</td>
+                {% if compare %}
+                    <td class="right">
+                        {% if row.last_price and row.estimated_price %}
+                            {{ ((row.last_price - row.estimated_price)|abs / row.last_price * 1000) | round(2) }}
+                        {% endif %}
+                    </td>
+                {% endif %}
             </tr>
         {% endfor %}
     </tbody>
