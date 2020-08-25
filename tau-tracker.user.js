@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Tau Station Universal Tracker
-// @version      1.7
+// @version      1.8
 // @author       Moritz Lenz <moritz.lenz@gmail.com>
 // @description  General data collection script for Tau Station. Please get an access token from moritz and add it in your preferences page.
 // @match        https://taustation.space/*
@@ -20,6 +20,11 @@ var game_desktop_message_list;
 var game_character_message_items;
 var utt_init_message_ui_done;
 
+
+function enrich_version(payload) {
+    payload.script_version = GM_info.script.version;
+    return payload;
+}
 
 function utt_add_message(message, color) {
     if (!utt_init_message_ui_done) {
@@ -177,7 +182,7 @@ function record_career_tasks(options, station) {
         type: "POST",
         url: url,
         dataType: 'json',
-        data: JSON.stringify(payload),
+        data: JSON.stringify(enrich_version(payload)),
         success: function(response) {
             if (response.recorded) {
                 let message = 'Tasks recorded. +1 brownie point!';
@@ -255,7 +260,7 @@ function extract_local_shuttles(options, station) {
         type: "POST",
         url: url,
         dataType: 'json',
-        data: JSON.stringify(payload),
+        data: JSON.stringify(enrich_version(payload)),
         success: function(response) {
             if (response.recorded) {
                 utt_add_message(response.message);
@@ -331,7 +336,7 @@ function extract_docks_ships(token, options, station) {
         type: "POST",
         url: url,
         dataType: 'json',
-        data: JSON.stringify(payload),
+        data: JSON.stringify(enrich_version(payload)),
         success: function(response) {
             if (response.success) {
                 if (response.message)
@@ -397,7 +402,7 @@ function extract_docks_cockpit(token, options, station) {
         type: "POST",
         url: url,
         dataType: 'json',
-        data: JSON.stringify(payload),
+        data: JSON.stringify(enrich_version(payload)),
         success: function(response) {
             if (response.recorded) {
                 utt_add_message(response.message);
@@ -448,7 +453,7 @@ function extract_docks_fuel(token, options, station) {
         type: "POST",
         url: url,
         dataType: 'json',
-        data: JSON.stringify(payload),
+        data: JSON.stringify(enrich_version(payload)),
         success: function(response) {
             if (response.recorded) {
                 let message = 'Fuel price recorded. +1 brownie point!<br>' + response.message;
