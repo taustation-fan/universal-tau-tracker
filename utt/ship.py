@@ -44,10 +44,10 @@ def ship_add():
 def ship_overview():
     ships = Ship.query.order_by(Ship.captain.asc(), Ship.name.asc())
 
-    return render_template('ship/overview.html', ships=ships, format_datetime=as_gct)
+    return render_template('ship/overview.html', ships=ships)
 
 @app.route('/ship/<registration>')
 def ship_detail(registration):
     ship = Ship.query.filter_by(registration=registration).one()
 
-    return render_template('ship/detail.html', ship=ship, format_datetime=as_gct)
+    return render_template('ship/detail.html', ship=ship)

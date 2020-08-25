@@ -1,0 +1,3 @@
+{% macro gct(t) %}
+    <abbr title="{{ t.strftime('%Y-%m-%d %H:%M:%S') }} UTC">{{ as_gct(t) }}</abbr>
+{% endmacro %}

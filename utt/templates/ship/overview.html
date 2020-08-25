@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Tau Station: Ship Registry{% endblock %}
 {% block content %}
+{% from 'macros.html' import gct %}
 
 <p>There are currently {{ ships.count() }} ships known to the Universal Tau Tracker:</p>
 
@@ -25,7 +26,7 @@
                 <td>{% set last_seen = ship.last_sighting %}
                     {% if last_seen %}{{ last_seen.station.short }}{% endif %}</td>
                 <td>{% set last_movement = ship.last_movement %}
-                    {% if last_movement %}{{ format_datetime(last_movement) }}{% endif %}</td>
+                    {% if last_movement %}{{ gct(last_movement) }}{% endif %}</td>
 
             </tr>
 

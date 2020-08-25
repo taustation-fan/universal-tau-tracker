@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Tau Station: {{ ship.name|escape }} in the Ship Registry{% endblock %}
 {% block content %}
+{% from 'macros.html' import gct %}
 
 <h2 id="details">Ship Details</h2>
 
@@ -52,8 +53,8 @@
             <tr>
                 <td>{{ s.station.short|escape }}</td>
                 <td>{{ s.sightings|length }}</td>
-                <td>{{ format_datetime(s.first.when) }}</td>
-                <td>{{ format_datetime(s.last.when) }}</td>
+                <td>{{ gct(s.first.when) }}</td>
+                <td>{{ gct(s.last.when) }}</td>
             </tr>
         {% endfor %}
     </tbody>
