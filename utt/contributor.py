@@ -14,8 +14,11 @@ from utt.model import db, \
 @app.route('/contributor')
 def contributor_statistics():
     token_to_character = {}
+    contributors = defaultdict(lambda: defaultdict(int))
     for t in Token.query.all():
         token_to_character[t.id] = t.character.name
+        if t.character.last_script_version:
+            contributors[t.character.name]['last_script_version'] = t.character.last_script_version
 
     pairs = (
         ('career', CareerBatchSubmission),
@@ -24,13 +27,12 @@ def contributor_statistics():
         ('distance', StationDistanceReading),
     )
     
-    counts = defaultdict(lambda: defaultdict(int))
     for name, model in pairs:
         attr = model.token_id
         q = db.session.query(attr, func.count()).group_by(attr)
         for token_id, count in q:
             character = token_to_character[token_id]
-            counts[character][name] += count
-    return render_template('contributor/overview.html', contributors=counts)
+            contributors[character][name] += count
+    return render_template('contributor/overview.html', contributors=contributors)
         
     

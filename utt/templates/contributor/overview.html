@@ -18,6 +18,7 @@ so numbers are not comparable across categories.</p>
             <th class="right">Distance<br>pairs</th>
             <th class="right">Fuel</br>price</th>
             <th class="right">Ship<br>positions</th>
+            <th class="right">Script<br>version</th>
         </tr>
     </thead>
     <tbody>
@@ -28,6 +29,7 @@ so numbers are not comparable across categories.</p>
                 <td class="right">{{ contributors[c].get('distance', 0) }}</td>
                 <td class="right">{{ contributors[c].get('fuel', 0) }}</td>
                 <td class="right">{{ contributors[c].get('ship', 0) }}</td>
+                <td class="right">{{ contributors[c].get('last_script_version', '') }}</td>
             </tr>
 
         {% endfor %}
