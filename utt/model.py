@@ -246,6 +246,16 @@ class Ship(db.Model):
         return ShipSighting.query.filter_by(ship_id=self.id).order_by(ShipSighting.when.desc()).first()
 
     @property
+    def last_movement(self):
+        ls = self.last_sighting
+        if ls is None:
+            return None
+        previous = ShipSighting.query.filter_by(ship_id=self.id).filter(ShipSighting.station_id != ls.station_id) \
+            .order_by(ShipSighting.when.desc()).first()
+        if previous:
+            return previous.when
+
+    @property
     def sighting_streaks(self):
         cached = getattr(self, '_sighting_streaks', None)
         if cached is not None:

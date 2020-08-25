@@ -12,6 +12,7 @@
             <th>Registration</th>
             <th>Class</th>
             <th>Last Seen</th>
+            <th>Last Movement</th>
         </tr>
     </thead>
     <tbody>
@@ -23,6 +24,8 @@
                 <td>{{ ship.ship_class.name | escape }}</td>
                 <td>{% set last_seen = ship.last_sighting %}
                     {% if last_seen %}{{ last_seen.station.short }}{% endif %}</td>
+                <td>{% set last_movement = ship.last_movement %}
+                    {% if last_movement %}{{ format_datetime(last_movement) }}{% endif %}</td>
 
             </tr>
 
