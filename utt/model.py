@@ -280,7 +280,6 @@ class Ship(db.Model):
     @property
     def siblings(self):
         return Ship.query.filter(Ship.captain == self.captain, Ship.id != self.id)
-    
 
 
 class ShipSightingStreak:

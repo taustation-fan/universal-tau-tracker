@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Tau Station: Contributors{% endblock %}
+{% block content %}
+
+
+<table id="contributors">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th class="right">Career<br>tasks</th>
+            <th class="right">Distance<br>pairs</th>
+            <th class="right">Fuel</br>price</th>
+            <th class="right">Ship<br>positions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in contributors.keys()|sort %}
+            <tr>
+                <th>{{ c | escape }}</th>
+                <td class="right">{{ contributors[c].get('career', 0) }}</td>
+                <td class="right">{{ contributors[c].get('distance', 0) }}</td>
+                <td class="right">{{ contributors[c].get('fuel', 0) }}</td>
+                <td class="right">{{ contributors[c].get('ship', 0) }}</td>
+            </tr>
+
+        {% endfor %}
+    </tbody>
+</table>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/css/theme.default.min.css" integrity="sha512-wghhOJkjQX0Lh3NSWvNKeZ0ZpNn+SPVXX1Qyc9OCaogADktxrBiBdKGDoqVUOyhStvMBmJQ8ZdMHiR3wuEq8+w==" crossorigin="anonymous" />
+<script src="/static/jquery-3.3.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/js/jquery.tablesorter.min.js" integrity="sha512-qzgd5cYSZcosqpzpn7zF2ZId8f/8CHmFKZ8j7mU4OUXTNRd5g+ZHBPsgKEwoqxCtdQvExE5LprwwPAgoicguNg==" crossorigin="anonymous"></script>
+
+<script>
+$(function() {
+    $('#contributors').css('max-width', '40em');
+    $('#contributors').tablesorter({widthFixed: false});
+});
+</script>
+
+
+
+{% endblock %}
+
