@@ -16,7 +16,8 @@ from utt.model import db, \
                       FuelPriceEstimation, \
                       FuelPriceReading, \
                       FuelPriceStatistics as FPS, \
-                      System
+                      System, \
+                      InvalidTokenException
 from utt.gct import gct_duration
 
 def now():
@@ -34,8 +35,10 @@ def fuel_add():
     token_str = payload['token']
     station_name = payload['station']
 
-    token = Token.query.filter_by(token=token_str).first()
-    if token is None:
+    try:
+        token = Token.verify(payload['token'])
+        token.record_script_version(payload.get('script_version'))
+    except InvalidTokenException:
         return jsonify({'recorded': False, 'message': 'Invalid token'})
 
     station = get_station(payload['system'], station_name)

@@ -16,7 +16,8 @@ from utt.model import db, \
                       Token, \
                       CareerBatchSubmission, \
                       CareerTask, \
-                      CareerTaskReading
+                      CareerTaskReading, \
+                      InvalidTokenException
 
 def now():
     return datetime.now(timezone.utc)
@@ -30,10 +31,13 @@ def career_task_add():
         message = 'Missing attributes: '  + ', '.join(missing_attrs)
         return jsonify({'recorded': False, 'missing': missing_attrs, message: message})
 
-    token_str = payload['token']
     station_name = payload['station']
+    try:
+        token = Token.verify(payload['token'])
+        token.record_script_version(payload.get('script_version'))
+    except InvalidTokenException:
+        return jsonify({'recorded': False, 'message': 'Invalid token'})
 
-    token = Token.query.filter_by(token=token_str).first()
     if token is None:
         return jsonify({'recorded': False, 'message': 'Invalid token'})
     if 'Confined to the' in station_name or 'Doing activity' in station_name:

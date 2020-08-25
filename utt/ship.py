@@ -20,6 +20,7 @@ def now():
 def ship_add():
     payload = request.get_json(force=True)
     token = Token.verify(payload['token'])
+    token.record_script_version(payload.get('script_version'))
     station = get_station(payload['system'], payload['station'])
     count = 0
     for ship_sighting in payload['ships']:

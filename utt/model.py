@@ -52,6 +52,7 @@ class Station(db.Model):
 class Character(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
+    last_script_version = db.Column(db.String())
     
 class Token(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -68,6 +69,11 @@ class Token(db.Model):
         except NoResultFound:
             raise InvalidTokenException()
             
+
+    def record_script_version(self, version):
+        if version is None:
+            version = 'pre 1.7'
+        self.character.last_script_version = str(version);
 
 ## Career task bonus tracking
 class CareerBatchSubmission(db.Model):

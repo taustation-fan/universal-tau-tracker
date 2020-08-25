@@ -25,7 +25,8 @@ from utt.model import db, \
                       Character, \
                       Token, \
                       StationPair, \
-                      StationDistanceReading
+                      StationDistanceReading, \
+                      InvalidTokenException
 
 @app.route('/v1/distance/add', methods=['POST'])
 def add_distance():
@@ -36,9 +37,10 @@ def add_distance():
         message = 'Missing attributes: '  + ', '.join(missing_attrs)
         return jsonify({'recorded': False, 'missing': missing_attrs, message: message})
 
-    token_str = payload['token']
-    token = Token.query.filter_by(token=token_str).first()
-    if token is None:
+    try:
+        token = Token.verify(payload['token'])
+        token.record_script_version(payload.get('script_version'))
+    except InvalidTokenException:
         return jsonify({'recorded': False, 'message': 'Invalid token'})
 
     station = get_station(payload['system'], payload['source'])
