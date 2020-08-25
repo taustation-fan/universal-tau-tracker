@@ -23,7 +23,7 @@ so numbers are not comparable across categories.</p>
     <tbody>
         {% for c in contributors.keys()|sort %}
             <tr>
-                <th>{{ c | escape }}</th>
+                <th><a href="https://taustation.space/character/by-name/{{c|escape}}">{{ c | escape }}</a></th>
                 <td class="right">{{ contributors[c].get('career', 0) }}</td>
                 <td class="right">{{ contributors[c].get('distance', 0) }}</td>
                 <td class="right">{{ contributors[c].get('fuel', 0) }}</td>
