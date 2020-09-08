@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Tau Station Universal Tracker
-// @version      1.8
+// @version      1.9
 // @author       Moritz Lenz <moritz.lenz@gmail.com>
 // @description  General data collection script for Tau Station. Please get an access token from moritz and add it in your preferences page.
 // @match        https://taustation.space/*
@@ -456,7 +456,12 @@ function extract_docks_fuel(token, options, station) {
         data: JSON.stringify(enrich_version(payload)),
         success: function(response) {
             if (response.recorded) {
-                let message = 'Fuel price recorded. +1 brownie point!<br>' + response.message;
+                let message = '';
+                if (options.compact_fuel_display){
+                    message = 'Fuel price recorded. +1 brownie point!<br><details><summary>Latest fuel prices</summary>' + response.message + '</details>';
+                } else {
+                    message = 'Fuel price recorded. +1 brownie point!<br>' + response.message;
+                }
                 utt_add_message(message);
             }
             else {
@@ -489,6 +494,12 @@ function extract_docks_fuel(token, options, station) {
                     label: 'Base API URL (leave empty for default)',
                     type: 'text',
                     default: '',
+                },
+                {
+                    key: 'compact_fuel_display',
+                    label: 'Compact fuel display',
+                    type: 'boolean',
+                    default: false,
                 }
             ],
         };
