@@ -9,11 +9,17 @@ Within Tau Station, there are several variables that change over time, including
 
 * Station distances due to orbital mechanics
 * Career task bonus factors
+* Fuel prices
 * Bodyguards
 
 ... and we expect more things in future to change over time.
 
 This tool aims to be an extensible platform to track such things, and give the user helpful feedback where possible.
+
+In general, you get up-to-date information from all contributors, and
+historic information [is available on the website.](https://tracker.tauguide.de/)
+
+For example, if you visit your private ship at the Docks, the script automatically submits the current fuel price to the central tracker, and in turn, you get all the fuel prices for the current day that have been reported so far.
 
 ### Career Tasks
 
@@ -40,12 +46,17 @@ If you visit the [Local Shuttles page](https://taustation.space/travel/area/loca
 
 ### Fuel Prices
 
+![Screenshot from a UTT-enhanced visit to the docks, which shows you the recorded and the lowest fuel prices.](img/screenshot-fuel-docks.png)
+
 The [October 2019 update](https://blog.taustation.space/blog/update-changelog-2019-oct-15/) introduced variable fuel prices.
 When you visit [the docks](https://taustation.space/area/docks) and have a private ship there (but aren't inside the cockpit),
 the userscript automatically records the current station's fuel price per gram, and gives you an overview of current fuel prices.
 
 In addition, a [public page](https://tracker.tauguide.de/fuel) gives an overview of fuel price ranges observed per station.
 
+### Ship Positions
+
+When you visit the Docks (sub-area of the Port) of the local station, the currently present ships are submitted [to the ship registry](https://tracker.tauguide.de/ship/).
 
 
 ## Setup
