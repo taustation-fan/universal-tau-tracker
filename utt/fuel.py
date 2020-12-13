@@ -198,3 +198,26 @@ def system_fuel_price(id):
         'systems': System.query.all()
     }
     return render_template('system_fuel_price.html', **ctx)
+
+@app.route('/fuel/estimation/export')
+def export_fuel_estimation():
+    token = Token.verify(request.args.get('token'))
+    date_string = request.args.get('date')
+    if date_string is None:
+        from datetime import date
+        day = date.today()
+    else:
+        day = datetime.strptime(date_string, '%Y-%m-%d').date()
+
+    rs = FuelPriceEstimation.query.filter_by(day=day).order_by(FuelPriceEstimation.station_id)
+    result = {
+        'date': str(day),
+        'stations': {
+            e.station.short: {
+                'name': e.station.name,
+                'estimated_fuel_price_per_g': e.price_per_g,
+            }
+            for e in rs
+        }
+    }
+    return jsonify(result)
