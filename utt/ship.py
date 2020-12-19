@@ -31,6 +31,9 @@ def ship_add():
             'name': ship_sighting['name'],
             'captain': ship_sighting['captain'],
         })
+        if not ship.captain and ship_sighting['captain']:
+            ship.captain = ship_sighting['captain']
+            db.sesison.add(ship)
         db.session.add(ShipSighting(
             ship=ship,
             station=station,
