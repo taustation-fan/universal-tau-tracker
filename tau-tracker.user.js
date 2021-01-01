@@ -557,6 +557,8 @@ function extract_item(options) {
         item_stats = extract_item_armor();
     } else if (item_type == 'Medical') {
         item_stats = extract_item_medical();
+    } else if (item_type == 'Food') {
+        item_stats = extract_item_food(item_desc);
     }
 
     let payload = Object.assign(
@@ -633,11 +635,26 @@ function extract_item_medical() {
         stat = stat.toLowerCase().replaceAll(' ', '_');
         if (stat.match('toxicity')) {
             value = value.replace('%', '');
-            stat = 'base_toxicity';
         }
         stats[stat] = parseFloat(value);
     });
     return stats;
+}
+
+function extract_item_food(desc) {
+    let match = desc.match(/This food gives (\w+)s a (\w+) (\w+) boost for (\d+) segment/);
+    if (!match)
+        return {};
+    let target_genotype = match[1];
+    let effect_size = match[2];
+    let affected_stat = match[3];
+    let duration_segments = parseInt(match[4]);
+    return {
+        target_genotype: target_genotype,
+        affected_stat: affected_stat,
+        effect_size: effect_size,
+        duration_segments: duration_segments,
+    };
 }
 
 (function() {
