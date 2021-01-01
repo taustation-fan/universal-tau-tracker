@@ -568,7 +568,7 @@ function extract_item(options) {
             "rarity":   item_rarity,
             "type":     item_type,
             "tier":     item_tier,
-            "desc":     item_desc,
+            "description": item_desc,
         },
         item_stats
     );
@@ -598,12 +598,12 @@ function extract_item_weapon() {
     let impact    = parseFloat( $('li.impact-damage').find('span').text() );
     let energy    = parseFloat( $('li.energy-damage').find('span').text() );
     let wpntype   = $('li.weapon_type').find('span').text();
-    let longrange = ( $('li.range').find('span').text() == 'Long' );
+    let range     = $('li.range').find('span').text();
     let hand2hand = ( $('li.hand-to-hand').find('span').text() == 'Yes' );
     return {
         "accuracy":         accuracy,
         "hand_to_hand":     hand2hand,
-        "long_range":       longrange,
+        "range":            range,
         "weapon_type":      wpntype,
         "piercing_damage":  piercing,
         "impact_damage":    impact,
@@ -633,7 +633,6 @@ function extract_item_medical() {
         stat = stat.toLowerCase().replaceAll(' ', '_');
         if (stat.match('toxicity')) {
             value = value.replace('%', '');
-            stat += '_percent';
         }
         stats[stat] = parseFloat(value);
     });
