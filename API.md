@@ -37,6 +37,13 @@ Example payload:
 The first part is the same among all item types, the second half (starting from `accuracy`)
 is weapon specific.
 
+For **armors**, these fields should be added:
+
+    "piercing_defense": 5.13,
+    "impact_defense": 14.17,
+    "energy_defense": 13.43,
+
+
 ### Recording Ship Positions
 
 URL: `v1/ship/add`
