@@ -26,7 +26,7 @@ Example payload:
 
         "accuracy": 0.3,
         "hand_to_hand": true,
-        "long_range": false,
+        "range": "Short",
         "weapon_type": "Blade",
         "piercing_damage": 9.5,
         "impact_damage": 4.73,
