@@ -131,3 +131,8 @@ def item_add():
     response = {'id': item.id}
 
     return jsonify(response)
+
+@app.route('/v1/item/list.json')
+def list_items():
+    items = [i.as_json() for i in Item.query.all()]
+    return jsonify({'items': items})
