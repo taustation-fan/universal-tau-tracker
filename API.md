@@ -23,10 +23,11 @@ Example payload:
         "rarity": "Common",
         "type": "Weapon",
         "tier": 3,
+        "description": "A mass produced combat axe. Freebooters often joke that they use it to crack open victims space suits while pillaging. At least, they seem to be laughing when they say it...",
 
         "accuracy": 0.3,
         "hand_to_hand": true,
-        "long_range": false,
+        "range": "Short",
         "weapon_type": "Blade",
         "piercing_damage": 9.5,
         "impact_damage": 4.73,
@@ -35,7 +36,29 @@ Example payload:
 
 
 The first part is the same among all item types, the second half (starting from `accuracy`)
-is weapon specific.
+is **weapon** specific.
+
+For **armors**, these fields should be added:
+
+    "piercing_defense": 5.13,
+    "impact_defense": 14.17,
+    "energy_defense": 13.43,
+
+For **medical**, add these fields:
+
+    "strength_boost": 0,
+    "agility_boost": 8.25,
+    "stamina_boost": 0,
+    "intelligence_boost": 0,
+    "social_boost": 0,
+    "base_toxicity": 10,
+
+**Food** needs these extra fields:
+
+    "target_genotype": "Colonist",
+    "affected_stat": "Strength",
+    "effect_size": "large",
+    "duration_segments": 1,
 
 ### Recording Ship Positions
 
@@ -71,3 +94,13 @@ Example payload:
           }
         ]
     }
+
+## Read Operations
+
+### Listing Items
+
+URL: `v1/item/list.json`
+
+Get a list of all items as JSON.
+
+TBD: this might need some adapting when more items are known.

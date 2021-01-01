@@ -431,7 +431,27 @@ class Item(db.Model):
     aspect_armor = db.relationship('ItemAspectArmor', back_populates='item', uselist=False)
     aspect_medical = db.relationship('ItemAspectMedical', back_populates='item', uselist=False)
     aspect_food = db.relationship('ItemAspectFood', back_populates='item', uselist=False)
+    
+    @property
+    def aspects(self):
+        return [a for a in (
+            self.aspect_armor,
+            self.aspect_medical,
+            self.aspect_food,
+            self.aspect_weapon,
+        ) if a is not None]
 
+    def as_json(self):
+        result = {
+            'slug': self.slug,
+            'name': self.name,
+            'type': self.item_type.name,
+            'rarity': self.rarity.name,
+            'description': self.description,
+        }
+        for aspect in self.aspects:
+            result.update(**aspect.as_json())
+        return result
 
 class ItemAspectWeapon(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -452,6 +472,17 @@ class ItemAspectWeapon(db.Model):
     impact_damage = db.Column(db.Float, nullable=False)
     energy_damage = db.Column(db.Float, nullable=False)
 
+    def as_json(self):
+        return {
+            'weapon_type': self.weapon_type.name,
+            'weapon_range': self.weapon_range.name,
+            'hand_to_hand': self.hand_to_hand,
+            'accuracy': self.accuracy,
+            'piercing_damage': self.piercing_damage,
+            'impact_damage': self.impact_damage,
+            'energy_damage': self.energy_damage,
+        }
+
 
 class ItemAspectArmor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -459,9 +490,16 @@ class ItemAspectArmor(db.Model):
     item_id = db.Column(db.ForeignKey('item.id'), nullable=False, unique=True)
     item = db.relationship('Item')
 
-    piercing_protection = db.Column(db.Float, nullable=False)
-    impact_protection = db.Column(db.Float, nullable=False)
-    energy_protection = db.Column(db.Float, nullable=False)
+    piercing_defense = db.Column(db.Float, nullable=False)
+    impact_defense = db.Column(db.Float, nullable=False)
+    energy_defense = db.Column(db.Float, nullable=False)
+
+    def as_json(self):
+        return {
+            'piercing_defense': self.piercing_defense,
+            'impact_defense': self.impact_defense,
+            'energy_defense': self.energy_defense,
+        }
 
 class ItemAspectMedical(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -475,6 +513,16 @@ class ItemAspectMedical(db.Model):
     stamina_boost = db.Column(db.Float, nullable=False)
     social_boost = db.Column(db.Float, nullable=False)
     intelligence_boost = db.Column(db.Float, nullable=False)
+
+    def as_json(self):
+        return {
+            'base_toxicity': self.base_toxicity,
+            'strength_boost': self.strength_boost,
+            'agility_boost': self.agility_boost,
+            'stamina_boost': self.stamina_boost,
+            'social_boost': self.social_boost,
+            'intelligence_boost': self.intelligence_boost,
+        }
 
 class FoodEffectSize(db.Model):
     """
@@ -501,3 +549,11 @@ class ItemAspectFood(db.Model):
     effect_size = db.relationship('FoodEffectSize')
 
     duration_segments = db.Column(db.Integer, nullable=False, default=1)
+
+    def as_json(self):
+        return {
+            'genotype':      self.genotype.name,
+            'affected_stat': self.affected_stat.name,
+            'effect_size':   self.effect_size.name,
+            'duration_segments': self.duration_segments,
+        }
