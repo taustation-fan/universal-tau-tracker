@@ -352,12 +352,16 @@ class ItemType(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), unique=True, nullable=False)
 
+    key = 'name'
+
 class ItemRarity(db.Model):
     """
     Item Rarity: common, uncommon, rare, epic
     """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), unique=True, nullable=False)
+
+    key = 'name'
 
 class WeaponType(db.Model):
     """
@@ -366,9 +370,11 @@ class WeaponType(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), unique=True, nullable=False)
 
+    key = 'name'
+
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), index=True, nullable=False)
+    name = db.Column(db.String(200), index=True, nullable=False, unique=True)
     slug = db.Column(db.String(200), index=True, unique=True)
     mass_kg = db.Column(db.Float, nullable=False)
     tier = db.Column(db.Integer, nullable=False)
@@ -384,6 +390,7 @@ class Item(db.Model):
     weapon_type_id = db.Column(db.ForeignKey('weapon_type.id'), nullable=True)
     weapon_type = db.relationship('WeaponType')
 
+    weapon_is_hand_to_hand = db.Column(db.Boolean, nullable=True)
     weapon_is_long_range = db.Column(db.Boolean, nullable=True)
 
     # not the daily and station-dependent value, but rather the one shown for example
@@ -391,6 +398,7 @@ class Item(db.Model):
     intrinsic_value_credits = db.Column(db.Float)
     intrinsic_value_bonds = db.Column(db.Integer)
 
+    weapon_accuracy = db.Column(db.Float)
     weapon_piercing_damage = db.Column(db.Float)
     weapon_impact_damage = db.Column(db.Float)
     weapon_energy_damage = db.Column(db.Float)
@@ -399,3 +407,11 @@ class Item(db.Model):
     armor_impact_protection = db.Column(db.Float)
     armor_energy_protection = db.Column(db.Float)
 
+    stim_strength_boost = db.Column(db.Float)
+    stim_agility_boost = db.Column(db.Float)
+    stim_stamina_boost = db.Column(db.Float)
+    stim_intelligence_bost = db.Column(db.Float)
+    stim_social_boost = db.Column(db.Float)
+    stim_base_toxicity = db.Column(db.Float)
+
+    key = 'name'
