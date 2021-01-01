@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Tau Station Universal Tracker
-// @version      1.10
+// @version      1.11
 // @author       Moritz Lenz <moritz.lenz@gmail.com>
 // @description  General data collection script for Tau Station. Please get an access token from moritz and add it in your preferences page.
 // @match        https://taustation.space/*
@@ -633,6 +633,7 @@ function extract_item_medical() {
         stat = stat.toLowerCase().replaceAll(' ', '_');
         if (stat.match('toxicity')) {
             value = value.replace('%', '');
+            stat = 'base_toxicity';
         }
         stats[stat] = parseFloat(value);
     });
