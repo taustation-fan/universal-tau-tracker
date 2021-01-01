@@ -53,6 +53,13 @@ For **medical**, add these fields:
     "social_boost": 0,
     "base_toxicity": 10,
 
+**Food** needs these extra fields:
+
+    "target_genotype": "Colonist",
+    "affected_stat": "Strength",
+    "effect_size": "large",
+    "duration_segments": 1,
+
 ### Recording Ship Positions
 
 URL: `v1/ship/add`
