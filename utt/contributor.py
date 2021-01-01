@@ -7,6 +7,7 @@ from utt.model import db, \
     CareerBatchSubmission, \
     Character, \
     FuelPriceReading, \
+    Item, \
     ShipSighting, \
     StationDistanceReading, \
     Token
@@ -25,6 +26,7 @@ def contributor_statistics():
         ('fuel', FuelPriceReading),
         ('ship', ShipSighting),
         ('distance', StationDistanceReading),
+        ('item', Item),
     )
     
     for name, model in pairs:
