@@ -389,6 +389,7 @@ class Item(db.Model):
     # not the daily and station-dependent value, but rather the one shown for example
     # in Storage
     intrinsic_value_credits = db.Column(db.Float)
+    intrinsic_value_bonds = db.Column(db.Integer)
 
     weapon_piercing_damage = db.Column(db.Float)
     weapon_impact_damage = db.Column(db.Float)
