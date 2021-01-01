@@ -128,7 +128,11 @@ def item_add():
     item_aspect_weapon(item, payload)
     db.session.commit()
 
-    response = {'id': item.id}
+    response = {
+        'id': item.id,
+        'recorded': True,
+        'message': '',
+    }
 
     return jsonify(response)
 
