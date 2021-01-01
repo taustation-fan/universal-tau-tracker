@@ -72,8 +72,9 @@ def item_aspect_food(item, attributes):
     if item.aspect_food:
         for k, v in modified_attributes.items():
             if v is not None:
-                setattr(item.aspect_food, v)
+                setattr(item.aspect_food, k, v)
         db.session.add(item.aspect_food)
+        return
     aspect = ItemAspectFood(item=item, **modified_attributes)
     db.session.add(aspect)
     print('Food aspect added for {}'.format(item.name))
@@ -100,8 +101,9 @@ def item_aspect_weapon(item, attributes):
     if item.aspect_weapon:
         for k, v in modified_attributes.items():
             if v is not None:
-                setattr(item.aspect_weapon, v)
+                setattr(item.aspect_weapon, k, v)
         db.session.add(item.aspect_weapon)
+        return
     aspect = ItemAspectWeapon(item=item, **modified_attributes)
     db.session.add(aspect)
     print('Weapon aspect added for {}'.format(item.name))
@@ -121,7 +123,7 @@ def item_add():
         'rarity': autovivify(ItemRarity, dict(name=payload['rarity'])),
         'item_type': autovivify(ItemType, dict(name=payload['type'])),
         'description': payload.get('description'),
-    })
+    }, update=True)
     item_aspect_armor(item, payload)
     item_aspect_medical(item, payload)
     item_aspect_food(item, payload)

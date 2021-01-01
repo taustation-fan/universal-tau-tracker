@@ -329,7 +329,7 @@ class ShipSighting(db.Model):
     token_id = db.Column(db.ForeignKey('token.id'), nullable=False)
     token = db.relationship('Token')
 
-def autovivify(model, attrs):
+def autovivify(model, attrs, update=False):
     """
     Tries to look up if an object matching the attributes in dict `attrs` exist.
     If not, creates and returns a new object.
@@ -338,7 +338,12 @@ def autovivify(model, attrs):
     key_val = attrs[key_col]
 
     try:
-        return model.query.filter(getattr(model, key_col) == key_val).one()
+        result = model.query.filter(getattr(model, key_col) == key_val).one()
+        if update:
+            for k, v in attrs.items():
+                if v is not None:
+                    setattr(result, k, v)
+        return result
     except NoResultFound:
         pass
     print('autovivify: creating new {}'.format(model))
