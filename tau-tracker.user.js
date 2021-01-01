@@ -633,7 +633,6 @@ function extract_item_medical() {
         stat = stat.toLowerCase().replaceAll(' ', '_');
         if (stat.match('toxicity')) {
             value = value.replace('%', '');
-            stat = 'base_toxicity';
         }
         stats[stat] = parseFloat(value);
     });
