@@ -373,6 +373,9 @@ class Item(db.Model):
     mass_kg = db.Column(db.Float, nullable=False)
     tier = db.Column(db.Integer, nullable=False)
 
+    token_id = db.Column(db.ForeignKey('token.id'), nullable=False)
+    token = db.relationship('Token')
+
     item_type_id = db.Column(db.ForeignKey('item_type.id'), nullable=False)
     item_type = db.relationship('ItemType')
     item_rarity_id = db.Column(db.ForeignKey('item_rarity.id'), nullable=False)
