@@ -14,14 +14,27 @@ from utt.model import (
     ItemType,
     ItemRarity,
     ItemAspectWeapon,
+    ItemAspectArmor,
     WeaponRange,
     WeaponType,
 )
 
+def item_aspect_armor(item, attributes):
+    required = ('piercing_defense', 'impact_defense', 'energy_defense')
+    for attr in required:
+        if attributes.get(attr) is None:
+            print('No attribute {}, so not an armor'.format(attr))
+            return
+
+    modified_attributes = {k: float(attributes[k]) for k in required}
+    if item.aspect_armor:
+        for k, v in modified_attributes.items():
+            setattr(item.aspect_armor, k, v)
+    else:
+        item.aspect_armor = ItemAspectArmor(item=item, **modified_attributes)
+        db.session.add(item.aspect_armor)
+
 def item_aspect_weapon(item, attributes):
-    if item.aspect_weapon:
-        # TODO: update attributes?
-        return
     required = ('accuracy', 'hand_to_hand', 'range', 'weapon_type',
                 'piercing_damage', 'impact_damage', 'energy_damage')
     for attr in required:
@@ -29,8 +42,7 @@ def item_aspect_weapon(item, attributes):
             print('No attribute {}, so not a weapon'.format(attr))
             return
 
-    aspect = ItemAspectWeapon(
-        item=item,
+    modified_attributes = dict(
         weapon_type=autovivify(WeaponType, {'name': attributes['weapon_type']}),
         weapon_range=autovivify(WeaponRange, {'name': attributes['range']}),
         hand_to_hand=attributes['hand_to_hand'],
@@ -39,6 +51,13 @@ def item_aspect_weapon(item, attributes):
         energy_damage=float(attributes['energy_damage']),
         accuracy=float(attributes['accuracy']),
     )
+
+    if item.aspect_weapon:
+        for k, v in modified_attributes.items():
+            if v is not None:
+                setattr(item.aspect_weapon, v)
+        db.session.add(item.aspect_weapon)
+    aspect = ItemAspectWeapon(item=item, **modified_attributes)
     db.session.add(aspect)
     print('Weapon aspect added for {}'.format(item.name))
     item.aspect_weapon = aspect
@@ -59,6 +78,7 @@ def item_add():
         'description': payload.get('description'),
     })
     item_aspect_weapon(item, payload)
+    item_aspect_armor(item, payload)
     db.session.commit()
 
     response = {'id': item.id}

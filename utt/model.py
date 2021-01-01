@@ -459,9 +459,9 @@ class ItemAspectArmor(db.Model):
     item_id = db.Column(db.ForeignKey('item.id'), nullable=False, unique=True)
     item = db.relationship('Item')
 
-    piercing_protection = db.Column(db.Float, nullable=False)
-    impact_protection = db.Column(db.Float, nullable=False)
-    energy_protection = db.Column(db.Float, nullable=False)
+    piercing_defense = db.Column(db.Float, nullable=False)
+    impact_defense = db.Column(db.Float, nullable=False)
+    energy_defense = db.Column(db.Float, nullable=False)
 
 class ItemAspectMedical(db.Model):
     id = db.Column(db.Integer, primary_key=True)
