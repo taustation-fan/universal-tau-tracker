@@ -344,3 +344,54 @@ def autovivify(model, attrs):
     new = model(**attrs)
     db.session.add(new)
     return new
+
+class ItemType(db.Model):
+    """
+    Item type: Weapon, Armor, VIP, Blueprint etc.
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), unique=True, nullable=False)
+
+class ItemRarity(db.Model):
+    """
+    Item Rarity: common, uncommon, rare, epic
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), unique=True, nullable=False)
+
+class WeaponType(db.Model):
+    """
+    Weapon Type: Hand Gun, Balde etc.
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), unique=True, nullable=False)
+
+class Item(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), index=True, nullable=False)
+    slug = db.Column(db.String(200), index=True, unique=True)
+    mass_kg = db.Column(db.Float, nullable=False)
+    tier = db.Column(db.Integer, nullable=False)
+
+    item_type_id = db.Column(db.ForeignKey('item_type.id'), nullable=False)
+    item_type = db.relationship('ItemType')
+    item_rarity_id = db.Column(db.ForeignKey('item_rarity.id'), nullable=False)
+    item_rarity = db.relationship('ItemRarity')
+
+    weapon_type_id = db.Column(db.ForeignKey('weapon_type.id'), nullable=True)
+    weapon_type = db.relationship('WeaponType')
+
+    weapon_is_long_range = db.Column(db.Boolean, nullable=True)
+
+    # not the daily and station-dependent value, but rather the one shown for example
+    # in Storage
+    intrinsic_value_credits = db.Column(db.Float)
+
+    weapon_piercing_damage = db.Column(db.Float)
+    weapon_impact_damage = db.Column(db.Float)
+    weapon_energy_damage = db.Column(db.Float)
+
+    armor_piercing_protection = db.Column(db.Float)
+    armor_impact_protection = db.Column(db.Float)
+    armor_energy_protection = db.Column(db.Float)
+
