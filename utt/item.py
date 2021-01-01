@@ -10,12 +10,16 @@ from utt.model import (
     autovivify,
     get_station,
     Token,
+    FoodEffectSize,
+    Genotype,
     Item,
     ItemType,
     ItemRarity,
-    ItemAspectWeapon,
     ItemAspectArmor,
     ItemAspectMedical,
+    ItemAspectFood,
+    ItemAspectWeapon,
+    Stat,
     WeaponRange,
     WeaponType,
 )
@@ -51,6 +55,29 @@ def item_aspect_medical(item, attributes):
         item.aspect_medical = ItemAspectMedical(item=item, **modified_attributes)
         db.session.add(item.aspect_medical)
 
+def item_aspect_food(item, attributes):
+    required = ("target_genotype", "affected_stat", "effect_size", "duration_segments")
+    for attr in required:
+        if attributes.get(attr) is None:
+            print('No attribute {}, so not a food'.format(attr))
+            return
+
+    modified_attributes = dict(
+        genotype=autovivify(Genotype, {'name': attributes['target_genotype']}),
+        affected_stat=autovivify(Stat, {'name': attributes['affected_stat']}),
+        effect_size=autovivify(FoodEffectSize, {'name': attributes['effect_size']}),
+        duration_segments=float(attributes['duration_segments']),
+    )
+
+    if item.aspect_food:
+        for k, v in modified_attributes.items():
+            if v is not None:
+                setattr(item.aspect_food, v)
+        db.session.add(item.aspect_food)
+    aspect = ItemAspectFood(item=item, **modified_attributes)
+    db.session.add(aspect)
+    print('Food aspect added for {}'.format(item.name))
+    item.aspect_food = aspect
 
 def item_aspect_weapon(item, attributes):
     required = ('accuracy', 'hand_to_hand', 'range', 'weapon_type',
@@ -97,6 +124,7 @@ def item_add():
     })
     item_aspect_armor(item, payload)
     item_aspect_medical(item, payload)
+    item_aspect_food(item, payload)
     item_aspect_weapon(item, payload)
     db.session.commit()
 

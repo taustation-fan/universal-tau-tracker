@@ -23,6 +23,7 @@ Example payload:
         "rarity": "Common",
         "type": "Weapon",
         "tier": 3,
+        "description": "A mass produced combat axe. Freebooters often joke that they use it to crack open victims space suits while pillaging. At least, they seem to be laughing when they say it...",
 
         "accuracy": 0.3,
         "hand_to_hand": true,
