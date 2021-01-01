@@ -94,3 +94,13 @@ Example payload:
           }
         ]
     }
+
+## Read Operations
+
+### Listing Items
+
+URL: `v1/item/list.json`
+
+Get a list of all items as JSON.
+
+TBD: this might need some adapting when more items are known.
