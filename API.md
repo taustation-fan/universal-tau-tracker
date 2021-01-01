@@ -35,7 +35,7 @@ Example payload:
 
 
 The first part is the same among all item types, the second half (starting from `accuracy`)
-is weapon specific.
+is **weapon** specific.
 
 For **armors**, these fields should be added:
 
@@ -43,6 +43,14 @@ For **armors**, these fields should be added:
     "impact_defense": 14.17,
     "energy_defense": 13.43,
 
+For **medical**, add these fields:
+
+    "strength_boost": 0,
+    "agility_boost": 8.25,
+    "stamina_boost": 0,
+    "intelligence_boost": 0,
+    "social_boost": 0,
+    "base_toxicity": 10,
 
 ### Recording Ship Positions
 

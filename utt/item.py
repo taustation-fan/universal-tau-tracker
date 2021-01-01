@@ -15,6 +15,7 @@ from utt.model import (
     ItemRarity,
     ItemAspectWeapon,
     ItemAspectArmor,
+    ItemAspectMedical,
     WeaponRange,
     WeaponType,
 )
@@ -33,6 +34,23 @@ def item_aspect_armor(item, attributes):
     else:
         item.aspect_armor = ItemAspectArmor(item=item, **modified_attributes)
         db.session.add(item.aspect_armor)
+
+def item_aspect_medical(item, attributes):
+    required = ('strength_boost', 'agility_boost', 'stamina_boost', 'intelligence_boost',
+                'social_boost', 'base_toxicity')
+    for attr in required:
+        if attributes.get(attr) is None:
+            print('No attribute {}, so not a medical'.format(attr))
+            return
+
+    modified_attributes = {k: float(attributes[k]) for k in required}
+    if item.aspect_medical:
+        for k, v in modified_attributes.items():
+            setattr(item.aspect_medical, k, v)
+    else:
+        item.aspect_medical = ItemAspectMedical(item=item, **modified_attributes)
+        db.session.add(item.aspect_medical)
+
 
 def item_aspect_weapon(item, attributes):
     required = ('accuracy', 'hand_to_hand', 'range', 'weapon_type',
@@ -77,8 +95,9 @@ def item_add():
         'item_type': autovivify(ItemType, dict(name=payload['type'])),
         'description': payload.get('description'),
     })
-    item_aspect_weapon(item, payload)
     item_aspect_armor(item, payload)
+    item_aspect_medical(item, payload)
+    item_aspect_weapon(item, payload)
     db.session.commit()
 
     response = {'id': item.id}
