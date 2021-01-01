@@ -10,7 +10,7 @@ db = SQLAlchemy()
 class InvalidTokenException(Exception):
     def __init__():
         super().__init__('You need a valid token')
-        
+
 
 def get_station(system_name, station_name, create=True):
     system = System.query.filter(func.lower(System.name)==system_name.lower()).first()
@@ -53,7 +53,7 @@ class Character(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     last_script_version = db.Column(db.String())
-    
+
 class Token(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     token = db.Column(db.String(80), unique=True, nullable=False)
@@ -68,7 +68,7 @@ class Token(db.Model):
             return cls.query.filter_by(token=token).one()
         except NoResultFound:
             raise InvalidTokenException()
-            
+
 
     def record_script_version(self, version):
         if version is None:
@@ -128,7 +128,7 @@ def get_station_pair(a, b):
         )
         db.session.add(pair)
     return pair
-            
+
 
 class StationPair(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -150,7 +150,7 @@ class StationPair(db.Model):
 
     __table_args__ = (
         db.UniqueConstraint('station_a_id', 'station_b_id'),
-    )    
+    )
     def __str__(self):
         return '{} ↔ {}'.format(self.station_a.name, self.station_b.name)
 
@@ -235,7 +235,7 @@ class ShipClass(db.Model):
     name = db.Column(db.String(), unique=True, nullable=False)
 
     key = 'name'
-    
+
 class Ship(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     registration = db.Column(db.String(), nullable=False, unique=True)
@@ -314,7 +314,7 @@ class ShipSightingStreak:
     @property
     def first(self):
         return self.sightings[0]
-        
+
     @property
     def last(self):
         return self.sightings[-1]
@@ -336,14 +336,36 @@ def autovivify(model, attrs):
     """
     key_col = model.key
     key_val = attrs[key_col]
-    
+
     try:
         return model.query.filter(getattr(model, key_col) == key_val).one()
     except NoResultFound:
         pass
+    print('autovivify: creating new {}'.format(model))
     new = model(**attrs)
     db.session.add(new)
     return new
+
+class Genotype(db.Model):
+    """
+    Gemontype: Baseline, Colonist, Belter, ...
+    Currently used for food, maybe will have other uses later
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), unique=True, nullable=False)
+
+    key = 'name'
+
+class Stat(db.Model):
+    """
+    Stat: Strength, Agility, ...
+    Currently used for food, maybe will have other uses later
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), unique=True, nullable=False)
+
+    key = 'name'
+
 
 class ItemType(db.Model):
     """
@@ -372,7 +394,18 @@ class WeaponType(db.Model):
 
     key = 'name'
 
+class WeaponRange(db.Model):
+    """
+    Weapon Range: Short, Long
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), unique=True, nullable=False)
+
+    key = 'name'
+
 class Item(db.Model):
+    key = 'name'
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), index=True, nullable=False, unique=True)
     slug = db.Column(db.String(200), index=True, unique=True)
@@ -384,34 +417,87 @@ class Item(db.Model):
 
     item_type_id = db.Column(db.ForeignKey('item_type.id'), nullable=False)
     item_type = db.relationship('ItemType')
-    item_rarity_id = db.Column(db.ForeignKey('item_rarity.id'), nullable=False)
-    item_rarity = db.relationship('ItemRarity')
+    rarity_id = db.Column(db.ForeignKey('item_rarity.id'), nullable=False)
+    rarity = db.relationship('ItemRarity')
 
-    weapon_type_id = db.Column(db.ForeignKey('weapon_type.id'), nullable=True)
-    weapon_type = db.relationship('WeaponType')
-
-    weapon_is_hand_to_hand = db.Column(db.Boolean, nullable=True)
-    weapon_is_long_range = db.Column(db.Boolean, nullable=True)
+    description = db.Column(db.Text)
 
     # not the daily and station-dependent value, but rather the one shown for example
     # in Storage
     intrinsic_value_credits = db.Column(db.Float)
     intrinsic_value_bonds = db.Column(db.Integer)
 
-    weapon_accuracy = db.Column(db.Float)
-    weapon_piercing_damage = db.Column(db.Float)
-    weapon_impact_damage = db.Column(db.Float)
-    weapon_energy_damage = db.Column(db.Float)
+    aspect_weapon = db.relationship('ItemAspectWeapon', back_populates='item', uselist=False)
+    aspect_armor = db.relationship('ItemAspectArmor', back_populates='item', uselist=False)
+    aspect_medical = db.relationship('ItemAspectMedical', back_populates='item', uselist=False)
+    aspect_food = db.relationship('ItemAspectFood', back_populates='item', uselist=False)
 
-    armor_piercing_protection = db.Column(db.Float)
-    armor_impact_protection = db.Column(db.Float)
-    armor_energy_protection = db.Column(db.Float)
 
-    stim_strength_boost = db.Column(db.Float)
-    stim_agility_boost = db.Column(db.Float)
-    stim_stamina_boost = db.Column(db.Float)
-    stim_intelligence_bost = db.Column(db.Float)
-    stim_social_boost = db.Column(db.Float)
-    stim_base_toxicity = db.Column(db.Float)
+class ItemAspectWeapon(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    item_id = db.Column(db.ForeignKey('item.id'), nullable=False, unique=True)
+    item = db.relationship('Item')
+
+    weapon_type_id = db.Column(db.ForeignKey('weapon_type.id'), nullable=False)
+    weapon_type = db.relationship('WeaponType')
+
+    weapon_range_id = db.Column(db.ForeignKey('weapon_range.id'), nullable=False)
+    weapon_range = db.relationship('WeaponRange')
+
+    hand_to_hand = db.Column(db.Boolean, nullable=False)
+
+    accuracy = db.Column(db.Float, nullable=False)
+    piercing_damage = db.Column(db.Float, nullable=False)
+    impact_damage = db.Column(db.Float, nullable=False)
+    energy_damage = db.Column(db.Float, nullable=False)
+
+
+class ItemAspectArmor(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    item_id = db.Column(db.ForeignKey('item.id'), nullable=False, unique=True)
+    item = db.relationship('Item')
+
+    piercing_protection = db.Column(db.Float, nullable=False)
+    impact_protection = db.Column(db.Float, nullable=False)
+    energy_protection = db.Column(db.Float, nullable=False)
+
+class ItemAspectMedical(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    item_id = db.Column(db.ForeignKey('item.id'), nullable=False, unique=True)
+    item = db.relationship('Item')
+
+    base_toxicity = db.Column(db.Float, nullable=False)
+    strength_boost = db.Column(db.Float, nullable=False)
+    agility_boost = db.Column(db.Float, nullable=False)
+    stamina_boost = db.Column(db.Float, nullable=False)
+    social_boost = db.Column(db.Float, nullable=False)
+    intelligence_boost = db.Column(db.Float, nullable=False)
+
+class FoodEffectSize(db.Model):
+    """
+    Food effect size: large, small
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(), unique=True, nullable=False)
 
     key = 'name'
+
+class ItemAspectFood(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    item_id = db.Column(db.ForeignKey('item.id'), nullable=False, unique=True)
+    item = db.relationship('Item')
+
+    genotype_id = db.Column(db.ForeignKey('genotype.id'), nullable=False)
+    genotype = db.relationship('Genotype')
+
+    affected_stat_id = db.Column(db.ForeignKey('stat.id'), nullable=False)
+    affected_stat = db.relationship('Stat')
+
+    effect_size_id = db.Column(db.ForeignKey('food_effect_size.id'), nullable=False)
+    effect_size = db.relationship('FoodEffectSize')
+
+    duration_segments = db.Column(db.Integer, nullable=False, default=1)
