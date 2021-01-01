@@ -572,7 +572,6 @@ function extract_item(options) {
         },
         item_stats
     );
-    console.log(payload);
     $.ajax({
         type: "POST",
         url: url,
