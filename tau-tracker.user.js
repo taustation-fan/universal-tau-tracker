@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Tau Station Universal Tracker
-// @version      1.9
+// @version      1.10
 // @author       Moritz Lenz <moritz.lenz@gmail.com>
 // @description  General data collection script for Tau Station. Please get an access token from moritz and add it in your preferences page.
 // @match        https://taustation.space/*
@@ -474,6 +474,172 @@ function extract_docks_fuel(token, options, station) {
     });
 }
 
+function extract_vendor(options, station) {
+    let url = options.base_url + 'v1/vendor-inventory/add';
+    let token = options.token;
+    if (!token) {
+        utt_add_message('Please configure your access token in the user preferences', 'orange');
+        return;
+    }
+    let vendor = $('h2.vendor-details-heading').text();
+    let vendor_items = [];
+    $('button.item.modal-toggle').each( function() {
+        let btn = $( this )[0];
+        let item_slug = btn.getAttribute('data-item-name');
+        // let name_span = btn.getElementsByClassName('name')[0];
+        // let item_category = name_span.childNodes[1].innerText.replace(/:$/, '');
+        // let item_name = name_span.childNodes[2].nodeValue.trim();
+        let currency_span = btn.getElementsByClassName('currency')[0];
+        let item_price_str = currency_span.childNodes[1].innerText;
+        let item_price = parseFloat( item_price_str.replaceAll(',', '') );
+        let item_currency = currency_span.childNodes[4].innerText;
+        vendor_items.push({
+            slug:       item_slug,
+            price:      item_price,
+            currency:   item_currency,
+        });
+    });
+    if (!vendor_items.length)
+        return;
+
+    let payload = {
+        token:      token,
+        station:    station.station,
+        system:     station.system,
+        vendor:     vendor,
+        inventory:  vendor_items,
+    };
+    $.ajax({
+        type: "POST",
+        url: url,
+        dataType: 'json',
+        data: JSON.stringify(enrich_version(payload)),
+        success: function(response) {
+            if (response.recorded) {
+                let message = 'Vendor inventory recorded. +1 brownie point!<br>' + response.message;
+                utt_add_message(message);
+            }
+            else {
+                utt_add_message('error recording vendor inventory: ' + response.message, 'orange');
+            }
+        },
+        error: function(xhr) {
+            utt_add_message('cannot talk to ' + url + ': ' + xhr.response_text, 'orange');
+        },
+    });
+}
+
+function extract_item(options) {
+    let url = options.base_url + 'v1/item/add';
+    let token = options.token;
+    if (!token) {
+        utt_add_message('Please configure your access token in the user preferences', 'orange');
+        return;
+    }
+
+    let loc = location.href.split('/').pop();
+    let item_slug = loc.split('?')[0]; // remove any potential GET parameters
+    let item_name = $('h1.name').text();
+    if (!item_name)
+        return;
+
+    let item_rarity = $('li.rarity').find('span').text();
+    let item_mass = $('li.weight').find('span').text();
+    let item_mass_kg = parseFloat( item_mass.replace(' kg', '') );
+    let item_tier = parseInt( $('li.tier').find('span').text() );
+    let item_type = $('li.type').find('span').text();
+    let item_desc = $('p.item-detailed-description').text();
+
+    let item_stats = {}
+    if (item_type == 'Weapon') {
+        item_stats = extract_item_weapon();
+    } else if (item_type == 'Armor') {
+        item_stats = extract_item_armor();
+    } else if (item_type == 'Medical') {
+        item_stats = extract_item_medical();
+    }
+
+    let payload = Object.assign(
+        {
+            "token":    token,
+            "slug":     item_slug,
+            "name":     item_name,
+            "mass_kg":  item_mass_kg,
+            "rarity":   item_rarity,
+            "type":     item_type,
+            "tier":     item_tier,
+            "desc":     item_desc,
+        },
+        item_stats
+    );
+    $.ajax({
+        type: "POST",
+        url: url,
+        dataType: 'json',
+        data: JSON.stringify(enrich_version(payload)),
+        success: function(response) {
+            if (response.recorded) {
+                let message = 'Item recorded. +1 brownie point!<br>' + response.message;
+                utt_add_message(message);
+            }
+            else {
+                utt_add_message('error recording item: ' + response.message, 'orange');
+            }
+        },
+        error: function(xhr) {
+            utt_add_message('cannot talk to ' + url + ': ' + xhr.response_text, 'orange');
+        },
+    });
+}
+
+function extract_item_weapon() {
+    let accuracy  = parseFloat( $('li.accuracy').find('span').text() );
+    let piercing  = parseFloat( $('li.piercing-damage').find('span').text() );
+    let impact    = parseFloat( $('li.impact-damage').find('span').text() );
+    let energy    = parseFloat( $('li.energy-damage').find('span').text() );
+    let wpntype   = $('li.weapon_type').find('span').text();
+    let longrange = ( $('li.range').find('span').text() == 'Long' );
+    let hand2hand = ( $('li.hand-to-hand').find('span').text() == 'Yes' );
+    return {
+        "accuracy":         accuracy,
+        "hand_to_hand":     hand2hand,
+        "long_range":       longrange,
+        "weapon_type":      wpntype,
+        "piercing_damage":  piercing,
+        "impact_damage":    impact,
+        "energy_damage":    energy,
+    };
+}
+
+function extract_item_armor() {
+    // yes, Taustation uses "damage" for the defense stats
+    let piercing  = parseFloat( $('li.piercing-damage').find('span').text() );
+    let impact    = parseFloat( $('li.impact-damage').find('span').text() );
+    let energy    = parseFloat( $('li.energy-damage').find('span').text() );
+    return {
+        "piercing_defense": piercing,
+        "impact_defense":   impact,
+        "energy_defense":   energy,
+    };
+}
+
+function extract_item_medical() {
+    let stats = {};
+    $('ul.data-list').find('li.strength').each( function() {
+        let $li = $(this);
+        let stat = $li[0].childNodes[0].textContent;
+        let value = $li.find('span').text();
+
+        stat = stat.toLowerCase().replaceAll(' ', '_');
+        if (stat.match('toxicity')) {
+            value = value.replace('%', '');
+            stat += '_percent';
+        }
+        stats[stat] = parseFloat(value);
+    });
+    return stats;
+}
+
 (function() {
     'use strict';
     let base_url = 'https://tracker.tauguide.de/';
@@ -505,16 +671,23 @@ function extract_docks_fuel(token, options, station) {
         };
     }
 
-    var station = get_station();
     // must always be called, otherwise preference editing breaks
     let options = userscript_preferences( pref_specs() );
     if (!options.base_url) {
         options.base_url = base_url;
     }
+
+    // item pages don't have a station
+    let path = window.location.pathname;
+    if (path.match('^/item')) {
+        extract_item(options);
+        return;
+    }
+
+    var station = get_station();
     if (!station) {
         return;
     }
-    let path = window.location.pathname;
     (function() {
         let url = options.base_url + 'v1/career-task/station-needs-update/' + encodeURIComponent(station.system) + '/' + encodeURIComponent(station.station);
         $.get(url, function (response) {
@@ -526,10 +699,14 @@ function extract_docks_fuel(token, options, station) {
 
     if (path.match('^/career')) {
         record_career_tasks(options, station);
-    } else if (path.match('^/area/local-shuttles')) {
+    }
+    else if (path.match('^/area/local-shuttles')) {
         extract_local_shuttles(options, station);
     }
     else if (path.match('^/area/docks')) {
         extract_docks(options, station);
+    }
+    else if (path.match('^/area/vendors/enter-shop')) {
+        extract_vendor(options, station);
     }
 }());
