@@ -598,3 +598,20 @@ class VendorInventoryItem(db.Model):
     __table_args__ = (
         db.UniqueConstraint('vendor_inventory_id', 'item_id'),
     )
+
+class VendorItemPriceReading(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    vendor_id = db.Column(db.ForeignKey('vendor.id'), nullable=False)
+    vendor = db.relationship('Vendor')
+    item_id = db.Column(db.ForeignKey('item.id'), nullable=False)
+    item = db.relationship('Item')
+    token_id = db.Column(db.ForeignKey('token.id'), nullable=False)
+    token = db.relationship('Token')
+
+    day = db.Column(db.Date, nullable=False)
+    price_credits = db.Column(db.Float)
+    price_bonds = db.Column(db.Integer)
+
+    __table_args__ = (
+        db.UniqueConstraint('vendor_id', 'item_id', 'day'),
+    )

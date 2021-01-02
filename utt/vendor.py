@@ -5,6 +5,7 @@ from flask import request, jsonify, render_template
 
 from utt.app import app
 from utt.gct import as_gct
+from utt.util import today
 from utt.model import (
     db,
     autovivify,
@@ -14,6 +15,7 @@ from utt.model import (
     Vendor,
     VendorInventory,
     VendorInventoryItem, 
+    VendorItemPriceReading,
 )
 
 def linkify(item_slug):
@@ -54,10 +56,12 @@ def add_vendory_inventory():
             )
         })
 
+    new_timestamp = datetime.utcnow()
+    day = today()
+
+    # make sure the inventory is up-to-date
     latest_inventory = VendorInventory.query.filter_by(vendor_id=vendor.id) \
         .order_by(VendorInventory.last_seen.desc()).first()
-
-    new_timestamp = datetime.utcnow()
 
     if latest_inventory and latest_inventory.item_slugs == slugs:
         # inventory still up to date
@@ -77,6 +81,39 @@ def add_vendory_inventory():
                 vendor_inventory=new_inv,
                 item=item,
             ))
+
+    # check/update item prices
+    def price_tuple(d):
+        v = d['price']
+        return (float(v), None) if d['currency'] == 'credits' else (None, int(v))
+
+    existing_prices = {vipr.item.slug: vipr for vipr in 
+        VendorItemPriceReading.query.filter_by(vendor_id=vendor.id, day=day)}
+
+    prices_updated = False
+    for d in payload['inventory']:
+        slug = d['slug']
+        credits, bonds = price_tuple(d)
+        if slug in existing_prices:
+            record = existing_prices[slug]
+            if record.price_credits != credits or record.price_bonds != bonds:
+                prices_updated = True
+                record.price_credits = credits
+                record.price_bonds = bonds
+                record.token = token
+        else:
+            db.session.add(VendorItemPriceReading(
+                token=token,
+                vendor=vendor,
+                item=Item.query.filter_by(slug=slug).one(),
+                day=day,
+                price_credits=credits,
+                price_bonds=bonds,
+            ))
+            prices_updated = True
+
+    if prices_updated:
+        messages.append('Price information recorded/updated.')
 
     db.session.commit()
     
