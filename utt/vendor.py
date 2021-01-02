@@ -16,6 +16,10 @@ from utt.model import (
     VendorInventoryItem, 
 )
 
+def linkify(item_slug):
+    # TODO: protect against cross-site scripting
+    return '<a href="https://taustation.space/{}">{}</a>'.format(item_log, item_slug)
+
 @app.route('/v1/vendor-inventory/add', methods=['POST'])
 def add_vendory_inventory():
     payload = request.get_json(force=True)
@@ -45,8 +49,8 @@ def add_vendory_inventory():
     if missing:
         return jsonify({
             'recorded': False,
-            'message': 'The Tracker does not know about the following item(s): ' + '  '.join(
-                ['https://taustation.space/item/' + slug for slug in missing]
+            'message': 'The Tracker does not know about the following item(s): ' + ', '.join(
+                [linkify(slug) for slug in missing]
             )
         })
 
