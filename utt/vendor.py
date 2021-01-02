@@ -22,11 +22,14 @@ def add_vendory_inventory():
     token = Token.verify(payload['token'])
     token.record_script_version(payload.get('script_version'))
 
+    messages = []
+
     station = get_station(payload['system'], payload['station'])
     vendor_name = payload['vendor']
 
     vendor = Vendor.query.filter_by(station_id=station.id, name=vendor_name).first()
     if not vendor:
+        messages.append('Vendor created.')
         vendor = Vendor(
             station=station,
             name=vendor_name,
@@ -55,6 +58,7 @@ def add_vendory_inventory():
     if latest_inventory and latest_inventory.item_slugs == slugs:
         # inventory still up to date
         latest_inventory.last_seen = new_timestamp
+        messages.append('Updated inventory timestamp.')
     else:
         new_inv = VendorInventory(
             token=token,
@@ -62,6 +66,7 @@ def add_vendory_inventory():
             first_seen=new_timestamp,
             last_seen=new_timestamp,
         )
+        messages.append('New inventory state recorded.')
         db.session.add(new_inv)
         for item in items.values():
             db.session.add(VendorInventoryItem(
@@ -71,5 +76,5 @@ def add_vendory_inventory():
 
     db.session.commit()
     
-    return jsonify({'recorded': True, 'message': 'foo'})
+    return jsonify({'recorded': True, 'message': ' '.join(messages)})
 
