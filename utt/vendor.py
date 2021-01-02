@@ -18,7 +18,7 @@ from utt.model import (
 
 def linkify(item_slug):
     # TODO: protect against cross-site scripting
-    return '<a href="https://taustation.space/{}">{}</a>'.format(item_log, item_slug)
+    return '<a href="https://taustation.space/{}">{}</a>'.format(item_slug, item_slug)
 
 @app.route('/v1/vendor-inventory/add', methods=['POST'])
 def add_vendory_inventory():
