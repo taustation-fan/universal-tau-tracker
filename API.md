@@ -97,6 +97,18 @@ Example payload:
 
 ## Read Operations
 
+### Retrieving a Single Item
+
+URL: `v1/item/by-slug/<slug>`  
+URL: `v1/item/by-name/<name>`
+
+Note that names must be URL encoded (slugs do not contain characters that must be URL encoded).
+
+Examples:
+
+* <https://tracker.tauguide.de/item/by-slug/vip-3>
+* <https://tracker.tauguide.de/item/by-name/Magnus%20Burnshield>
+
 ### Listing Items
 
 URL: `v1/item/list.json`

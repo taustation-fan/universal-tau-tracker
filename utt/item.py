@@ -142,3 +142,19 @@ def item_add():
 def list_items():
     items = [i.as_json() for i in Item.query.all()]
     return jsonify({'items': items})
+
+@app.route('/v1/item/by-slug/<slug>')
+def item_by_slug(slug):
+    item = Item.query.filter_by(slug=slug).first()
+    if item:
+        return jsonify(item.as_json())
+    else:
+        return jsonify({'message': 'Not found'})
+
+@app.route('/v1/item/by-name/<name>')
+def item_by_name(name):
+    item = Item.query.filter_by(name=name).first()
+    if item:
+        return jsonify(item.as_json())
+    else:
+        return jsonify({'message': 'Not found'})
