@@ -562,3 +562,39 @@ class ItemAspectFood(db.Model):
             'effect_size':   self.effect_size.name,
             'duration_segments': self.duration_segments,
         }
+
+
+class Vendor(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    station_id = db.Column(db.ForeignKey('station.id'), nullable=False)
+    station = db.relationship('Station')
+    name = db.Column(db.String(200), nullable=False)
+    __table_args__ = (
+        db.UniqueConstraint('station_id', 'name'),
+    )
+
+class VendorInventory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    vendor_id = db.Column(db.ForeignKey('vendor.id'), nullable=False)
+    vendor = db.relationship('Vendor')
+    first_seen = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.utcnow)
+    last_seen = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.utcnow)
+    token_id = db.Column(db.ForeignKey('token.id'), nullable=False)
+    token = db.relationship('Token')
+
+    inventory_items = db.relationship('VendorInventoryItem', back_populates='vendor_inventory')
+
+    @property
+    def item_slugs(self):
+        return {i.item.slug for i in self.inventory_items if i.item.slug is not None}
+
+class VendorInventoryItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    vendor_inventory_id = db.Column(db.ForeignKey('vendor_inventory.id'), nullable=False)
+    vendor_inventory = db.relationship('VendorInventory')
+    item_id = db.Column(db.ForeignKey('item.id'), nullable=False)
+    item = db.relationship('Item')
+
+    __table_args__ = (
+        db.UniqueConstraint('vendor_inventory_id', 'item_id'),
+    )
