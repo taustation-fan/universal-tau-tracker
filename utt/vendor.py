@@ -93,6 +93,8 @@ def add_vendory_inventory():
     prices_updated = False
     for d in payload['inventory']:
         slug = d['slug']
+        if slug == 'vip-3':
+            continue
         credits, bonds = price_tuple(d)
         if slug in existing_prices:
             record = existing_prices[slug]
