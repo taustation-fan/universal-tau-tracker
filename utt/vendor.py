@@ -44,7 +44,7 @@ def add_vendory_inventory():
     missing = [slug for slug in slugs if not slug in items]
     if missing:
         return jsonify({
-            'recorded': false,
+            'recorded': False,
             'message': 'The Tracker does not know about the following item(s): ' + '  '.join(
                 ['https://taustation.space/item/' + slug for slug in missing]
             )
