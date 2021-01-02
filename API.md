@@ -106,8 +106,8 @@ Note that names must be URL encoded (slugs do not contain characters that must b
 
 Examples:
 
-* <https://tracker.tauguide.de/item/by-slug/vip-3>
-* <https://tracker.tauguide.de/item/by-name/Magnus%20Burnshield>
+* <https://tracker.tauguide.de/v1/item/by-slug/vip-3>
+* <https://tracker.tauguide.de/v1/item/by-name/Magnus%20Burnshield>
 
 ### Listing Items
 
