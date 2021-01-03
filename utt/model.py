@@ -617,6 +617,9 @@ class VendorItemPriceReading(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     vendor_id = db.Column(db.ForeignKey('vendor.id'), nullable=False)
     vendor = db.relationship('Vendor')
+    vendor_inventory_id = db.Column(db.ForeignKey('vendor_inventory.id'))
+    vendor_inventory = db.relationship('VendorInventory')
+
     item_id = db.Column(db.ForeignKey('item.id'), nullable=False)
     item = db.relationship('Item')
     token_id = db.Column(db.ForeignKey('token.id'), nullable=False)

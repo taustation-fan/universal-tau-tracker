@@ -73,17 +73,17 @@ def add_vendory_inventory():
         else:
             latest_inventory.is_current = False
     else:
-        new_inv = VendorInventory(
+        latest_inventory = VendorInventory(
             token=token,
             vendor=vendor,
             first_seen=new_timestamp,
             last_seen=new_timestamp,
         )
         messages.append('New inventory state recorded.')
-        db.session.add(new_inv)
+        db.session.add(latest_inventory)
         for item in items.values():
             db.session.add(VendorInventoryItem(
-                vendor_inventory=new_inv,
+                vendor_inventory=latest_inventory,
                 item=item,
             ))
 
@@ -112,6 +112,7 @@ def add_vendory_inventory():
             db.session.add(VendorItemPriceReading(
                 token=token,
                 vendor=vendor,
+                vendor_inventory=latest_inventory,
                 item=Item.query.filter_by(slug=slug).one(),
                 day=day,
                 price_credits=credits,
