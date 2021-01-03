@@ -116,8 +116,29 @@
             <td>{{ am.base_toxicity }}%</td>
         </tr>
 {% endif %}
+{% set af = item.aspect_food %}
+{% if af %}
+        <tr>
+            <th colspan="2">Food Properties</th>
+        </tr>
+        <tr>
+            <th class="right">Genotype</th>
+            <td>{{ af.genotype.name | escape }}</td>
+        </tr>
+        <tr>
+            <th class="right">Affected Stat</th>
+            <td>{{ af.affected_stat.name | escape }}</td>
+        </tr>
+        <tr>
+            <th class="right">Effect Size</th>
+            <td>{{ af.effect_size.name | escape }}</td>
+        </tr>
+        <tr>
+            <th class="right">Duration</th>
+            <td>{{ af.duration_segments | escape }} segments</td>
+        </tr>
 
-<!-- TODO: food aspect -->
+{% endif %}
 
     </tbody>
 </table>
