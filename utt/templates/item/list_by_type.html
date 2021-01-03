@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Tau Station: Items of type {{type_name}}{% endblock %}
+{% block content %}
+
+<h1>Items of type {{type_name|escape}}</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th class="right">Name</th>
+            <th>Tier</th>
+            <th>Rarity</th>
+            <th>Mass (kg)</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for item in items %}
+        <tr>
+            <th class="right"><a href="/item/detail/{{item.id}}">{{item.name | escape }}</a></th>
+            <td>{{item.tier}}</td>
+            <td>{{item.rarity.name}}</td>
+            <td>{{item.mass_kg | round(2)}}</td>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
+

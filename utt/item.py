@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy import func
 from flask import request, jsonify, render_template, abort
 
 from utt.app import app
@@ -169,5 +170,16 @@ def item_detail(id):
 
     if not item:
         return abort(404)
-    
+
     return render_template('item/detail.html', item=item)
+
+@app.route('/item/by_type/<type_name>')
+def item_list_by_type(type_name):
+    items = Item.query.join('item_type').filter(ItemType.name == type_name).order_by(Item.tier.asc(), Item.name.asc())
+
+    return render_template('item/list_by_type.html', items=items, type_name=type_name)
+
+@app.route('/item')
+def item_overview():
+    rs = Item.query.join('item_type').with_entities(ItemType.name, func.count()).group_by(ItemType.name).order_by(ItemType.name.asc())
+    return render_template('item/overview.html', types=rs)

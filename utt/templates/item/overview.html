@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Tau Station: Items{% endblock %}
+{% block content %}
+
+<h1>Items</h1>
+
+Please select a type first:
+
+<table>
+    <thead>
+        <tr>
+            <th class="right">Type</th>
+            <th>Number of entries</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for type_name, count in types %}
+    <tr>
+        <th class="right"><a href="/item/by_type/{{ type_name | escape }}">{{ type_name | escape }}</a></th>
+        <td>{{ count }}</td>
+    </tr>
+{% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
+
