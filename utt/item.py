@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from sqlalchemy.orm.exc import NoResultFound
-from flask import request, jsonify, render_template
+from flask import request, jsonify, render_template, abort
 
 from utt.app import app
 from utt.gct import as_gct
@@ -155,3 +155,19 @@ def item_by_name(name):
         return jsonify(item.as_json())
     else:
         return jsonify({'message': 'Not found'})
+
+
+## Item displaying
+
+@app.route('/item/detail/<id>')
+def item_detail(id):
+    try:
+        item = Item.query.filter_by(id=int(id)).first()
+    except ValueError:
+        item = Item.query.filter_by(slug=id).first() \
+            or Item.query.filter_by(name=id).first()
+
+    if not item:
+        return abort(404)
+    
+    return render_template('item/detail.html', item=item)

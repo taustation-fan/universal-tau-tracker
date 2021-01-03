@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Tau Station: Item {{item.name|escape}}{% endblock %}
+{% block content %}
+
+<h1>{{item.name|escape}}</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th class="right">Attribute</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th class="right">Name</th>
+            <td>{{item.name | escape }}</td>
+        </tr>
+        <tr>
+            <th class="right">Rarity</th>
+            <td>{{item.rarity.name | escape }}</td>
+        </tr>
+        <tr>
+            <th class="right">Mass</th>
+            <td>{{item.mass_kg | round(2) }} kg</td>
+        </tr>
+        <tr>
+            <th class="right">Type</th>
+            <td>{{item.item_type.name | escape }}</td>
+        </tr>
+        <tr>
+            <th class="right">Tier</th>
+            <td>{{item.tier }}</td>
+        </tr>
+{% if item.slug %}
+        <tr>
+            <th class="right">In-game link</th>
+            <td><a href="https://taustation.space/item/{{item.slug}}">{{ item.name }}</a></td>
+        </tr>
+{% endif %}
+{% set aw = item.aspect_weapon %}
+{% if aw %}
+        <tr>
+            <th colspan="2">Weapon Properties</th>
+        </tr>
+        <tr>
+            <th class="right">Accuracy</th>
+            <td>{{ aw.accuracy | round(3) }}</td>
+        </tr>
+        <tr>
+            <th class="right">Hand-to-hand</th>
+            <td>{% if aw.hand_to_hand %}Yes{% else %}No{%endif%}</td>
+        </tr>
+        <tr>
+            <th class="right">Range</th>
+            <td>{{ aw.weapon_range.name | escape }}</td>
+        </tr>
+        <tr>
+            <th class="right">Piercing Damage</th>
+            <td>{{ aw.piercing_damage | round(2) }}</td>
+        </tr>
+        <tr>
+            <th class="right">Impact Damage</th>
+            <td>{{ aw.impact_damage | round(2) }}</td>
+        </tr>
+        <tr>
+            <th class="right">Energy Damage</th>
+            <td>{{ aw.energy_damage | round(2) }}</td>
+        </tr>
+{% endif %}
+{% set aa = item.aspect_armor %}
+{% if aa %}
+        <tr>
+            <th colspan="2">Armor Properties</th>
+        </tr>
+        <tr>
+            <th class="right">Piercing Defense</th>
+            <td>{{ aa.piercing_defense | round(2) }}</td>
+        </tr>
+        <tr>
+            <th class="right">Impact Defense</th>
+            <td>{{ aa.impact_defense | round(2) }}</td>
+        </tr>
+        <tr>
+            <th class="right">Energy Defense</th>
+            <td>{{ aa.energy_defense | round(2) }}</td>
+        </tr>
+{% endif %}
+{% set am = item.aspect_medical %}
+{% if am %}
+        <tr>
+            <th colspan="2">Medical Properties</th>
+        </tr>
+        <tr>
+            <th class="right">Strength Boost</th>
+            <td>{{ am.strength_boost | round(2) }}</td>
+        </tr>
+        <tr>
+            <th class="right">Agility Boost</th>
+            <td>{{ am.agility_boost | round(2) }}</td>
+        </tr>
+        <tr>
+            <th class="right">Stamina Boost</th>
+            <td>{{ am.stamina_boost | round(2) }}</td>
+        </tr>
+        <tr>
+            <th class="right">Intelligence Boost</th>
+            <td>{{ am.intelligence_boost | round(2) }}</td>
+        </tr>
+        <tr>
+            <th class="right">Social Boost</th>
+            <td>{{ am.social_boost | round(2) }}</td>
+        </tr>
+        <tr>
+            <th class="right">Base Toxicity</th>
+            <td>{{ am.base_toxicity }}%</td>
+        </tr>
+{% endif %}
+
+<!-- TODO: food aspect -->
+
+    </tbody>
+</table>
+
+{% endblock %}
+
