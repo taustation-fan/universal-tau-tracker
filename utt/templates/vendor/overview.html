@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Tau Station: Items{% endblock %}
+{% block content %}
+
+<h1>Vendors</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Station</th>
+            <th>System</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for vendor in vendors %}
+        <tr>
+            <td>{{ vendor.name | escape }}</td>
+            <td>{{ vendor.station.name | escape }}</td>
+            <td>{{ vendor.station.system.name | escape }}</td>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
+

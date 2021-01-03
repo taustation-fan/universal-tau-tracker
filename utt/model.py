@@ -44,6 +44,7 @@ class Station(db.Model):
     system = db.relationship('System', backref='stations')
     name = db.Column(db.String(200), unique=True, nullable=False)
     short = db.Column(db.String())
+    level = db.Column(db.Integer)
     name_lower = db.Column(db.String(200), unique=True, nullable=False)
     fit_radius_km = db.Column(db.Float)
     fit_period_u = db.Column(db.Float)

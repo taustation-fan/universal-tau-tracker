@@ -10,6 +10,8 @@ from utt.model import (
     db,
     autovivify,
     get_station,
+    Station,
+    System,
     Token,
     Item,
     Vendor,
@@ -127,3 +129,8 @@ def add_vendory_inventory():
     
     return jsonify({'recorded': True, 'message': ' '.join(messages)})
 
+@app.route('/vendor')
+def vendor_overview():
+    vendors = Vendor.query.join(Station, System).order_by(System.rank, Station.level, Station.name, Vendor.name)
+
+    return render_template('vendor/overview.html', vendors=vendors)
