@@ -62,13 +62,16 @@ def add_vendory_inventory():
     day = today()
 
     # make sure the inventory is up-to-date
-    latest_inventory = VendorInventory.query.filter_by(vendor_id=vendor.id) \
+    latest_inventory = VendorInventory.query.filter_by(vendor_id=vendor.id, is_current=True) \
         .order_by(VendorInventory.last_seen.desc()).first()
 
-    if latest_inventory and latest_inventory.item_slugs == slugs:
-        # inventory still up to date
-        latest_inventory.last_seen = new_timestamp
-        messages.append('Updated inventory timestamp.')
+    if latest_inventory:
+        if  latest_inventory.item_slugs == slugs:
+            # inventory still up to date
+            latest_inventory.last_seen = new_timestamp
+            messages.append('Updated inventory timestamp.')
+        else:
+            latest_inventory.is_current = False
     else:
         new_inv = VendorInventory(
             token=token,

@@ -594,6 +594,7 @@ class VendorInventory(db.Model):
     last_seen = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.utcnow)
     token_id = db.Column(db.ForeignKey('token.id'), nullable=False)
     token = db.relationship('Token')
+    is_current = db.Column(db.Boolean, nullable=False, default=True)
 
     inventory_items = db.relationship('VendorInventoryItem', back_populates='vendor_inventory')
 
