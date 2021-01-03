@@ -38,6 +38,25 @@
             <td><a href="https://taustation.space/item/{{item.slug}}">{{ item.name }}</a></td>
         </tr>
 {% endif %}
+{% set min_p = item.min_vendor_price_reading %}
+{% set max_p = item.max_vendor_price_reading %}
+{% if min_p %}
+        <tr>
+            <th colspan="2">Vendors</th>
+        </tr>
+    {% if min_p %}
+        <tr>
+            <th class="right">Min vendor price</th>
+            <td>{% if min_p.price_credits is not none %}{{ min_p.price_credits }} credits{% else %}{{ min_p.price_bonds}} bonds{%endif%} from <i>{{ min_p.vendor.name }}</i> on {{ min_p.vendor.station.short or min_p.vendor.station.name }}, observed on {{ min_p.day }}</td>
+        </tr>
+    {% endif %}
+    {% if max_p %}
+        <tr>
+            <th class="right">Max vendor price</th>
+            <td>{% if max_p.price_credits is not none %}{{ max_p.price_credits }} credits{% else %}{{ max_p.price_bonds}} bonds{%endif%} from <i>{{ max_p.vendor.name }}</i> on {{ max_p.vendor.station.short or max_p.vendor.station.name }}, observed on {{ max_p.day }}</td>
+        </tr>
+    {% endif %}
+{% endif %}
 {% set aw = item.aspect_weapon %}
 {% if aw %}
         <tr>
