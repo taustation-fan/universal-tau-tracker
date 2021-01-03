@@ -38,25 +38,6 @@
             <td><a href="https://taustation.space/item/{{item.slug}}">{{ item.name }}</a></td>
         </tr>
 {% endif %}
-{% set min_p = item.min_vendor_price_reading %}
-{% set max_p = item.max_vendor_price_reading %}
-{% if min_p %}
-        <tr>
-            <th colspan="2">Vendors</th>
-        </tr>
-    {% if min_p %}
-        <tr>
-            <th class="right">Min vendor price</th>
-            <td>{% if min_p.price_credits is not none %}{{ min_p.price_credits }} credits{% else %}{{ min_p.price_bonds}} bonds{%endif%} from <i>{{ min_p.vendor.name }}</i> on {{ min_p.vendor.station.short or min_p.vendor.station.name }}, observed on {{ min_p.day }}</td>
-        </tr>
-    {% endif %}
-    {% if max_p %}
-        <tr>
-            <th class="right">Max vendor price</th>
-            <td>{% if max_p.price_credits is not none %}{{ max_p.price_credits }} credits{% else %}{{ max_p.price_bonds}} bonds{%endif%} from <i>{{ max_p.vendor.name }}</i> on {{ max_p.vendor.station.short or max_p.vendor.station.name }}, observed on {{ max_p.day }}</td>
-        </tr>
-    {% endif %}
-{% endif %}
 {% set aw = item.aspect_weapon %}
 {% if aw %}
         <tr>
@@ -161,6 +142,50 @@
 
     </tbody>
 </table>
+
+<h2>Vendor Availability</h2>
+
+{% set inventories = item.current_inventories %}
+
+{% if inventories %}
+<table>
+    <thead>
+        <tr>
+            <th>Vendor</th>
+            <th>Station</th>
+            <th>Min Price</th>
+            <th>Min Price Date</th>
+            <th>Max Price</th>
+            <th>Max Price Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for iv in inventories %}
+            <tr>
+                <td>{{ iv.vendor.name | escape }}</td>
+                <td>{{ iv.vendor.station.short or iv.vendor.station.name | escape}}</td>
+                {% set min_reading = iv.min_price_for(item) %}
+                {% if min_reading %}
+                    <td>{{ min_reading.price_with_unit }}</td>
+                    <td>{{ min_reading.day }}</td>
+                {% else %}
+                    <td></td> <td></td>
+                {% endif %}
+                {% set max_reading = iv.max_price_for(item) %}
+                {% if max_reading %}
+                    <td>{{ max_reading.price_with_unit }}</td>
+                    <td>{{ max_reading.day }}</td>
+                {% else %}
+                    <td></td> <td></td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% else %}
+There is no vendor known that sells this item.
+{% endif %}
 
 {% endblock %}
 

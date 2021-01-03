@@ -459,22 +459,13 @@ class Item(db.Model):
         return result
 
     @property
-    def min_vendor_price_reading(self):
-        return VendorItemPriceReading.query.join('vendor_inventory') \
-            .filter(VendorItemPriceReading.item_id == self.id).filter(VendorInventory.is_current == True) \
-            .order_by(
-                VendorItemPriceReading.price_credits.asc(),
-                VendorItemPriceReading.price_bonds.asc(),
-            ).first()
-
-    @property
-    def max_vendor_price_reading(self):
-        return VendorItemPriceReading.query.join('vendor_inventory') \
-            .filter(VendorItemPriceReading.item_id == self.id).filter(VendorInventory.is_current == True) \
-            .order_by(
-                VendorItemPriceReading.price_credits.desc(),
-                VendorItemPriceReading.price_bonds.desc(),
-            ).first()
+    def current_inventories(self):
+        return VendorInventory.query.filter_by(is_current=True).filter(
+            VendorInventoryItem.query.filter(
+                VendorInventoryItem.item_id == self.id,
+                VendorInventoryItem.vendor_inventory_id == VendorInventory.id,
+            ).exists()
+        )
 
 class ItemAspectWeapon(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -607,6 +598,18 @@ class VendorInventory(db.Model):
     def item_slugs(self):
         return {i.item.slug for i in self.inventory_items if i.item.slug is not None}
 
+    def min_price_for(self, item):
+        return VendorItemPriceReading.query.filter_by(vendor_inventory_id=self.id, item_id=item.id).order_by(
+            VendorItemPriceReading.price_credits.asc(),
+            VendorItemPriceReading.price_bonds.asc(),
+        ).first()
+    def max_price_for(self, item):
+        return VendorItemPriceReading.query.filter_by(vendor_inventory_id=self.id, item_id=item.id).order_by(
+            VendorItemPriceReading.price_credits.desc(),
+            VendorItemPriceReading.price_bonds.desc(),
+        ).first()
+    
+
 class VendorInventoryItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     vendor_inventory_id = db.Column(db.ForeignKey('vendor_inventory.id'), nullable=False)
@@ -637,3 +640,10 @@ class VendorItemPriceReading(db.Model):
     __table_args__ = (
         db.UniqueConstraint('vendor_id', 'item_id', 'day'),
     )
+
+    @property
+    def price_with_unit(self):
+        if self.price_credits is None:
+            return "{} bonds".format(self.price_bonds)
+        else:
+            return "{:.2f} credits".format(self.price_credits)
