@@ -1,3 +1,15 @@
 {% macro gct(t) %}
     <abbr title="{{ t.strftime('%Y-%m-%d %H:%M:%S') }} UTC">{{ as_gct(t) }}</abbr>
 {% endmacro %}
+
+{% macro tablesorter(selector) %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/css/theme.default.min.css" integrity="sha512-wghhOJkjQX0Lh3NSWvNKeZ0ZpNn+SPVXX1Qyc9OCaogADktxrBiBdKGDoqVUOyhStvMBmJQ8ZdMHiR3wuEq8+w==" crossorigin="anonymous" />
+    <script src="/static/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/js/jquery.tablesorter.min.js" integrity="sha512-qzgd5cYSZcosqpzpn7zF2ZId8f/8CHmFKZ8j7mU4OUXTNRd5g+ZHBPsgKEwoqxCtdQvExE5LprwwPAgoicguNg==" crossorigin="anonymous"></script>
+
+    <script>
+    $(function() {
+        $('{{selector}}').tablesorter({widthFixed: false});
+    });
+    </script>
+{% endmacro %}

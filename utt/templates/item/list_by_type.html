@@ -4,13 +4,26 @@
 
 <h1>Items of type {{type_name|escape}}</h1>
 
-<table>
+<table class="sortable">
     <thead>
         <tr>
             <th class="right">Name</th>
             <th>Tier</th>
             <th>Rarity</th>
             <th>Mass (kg)</th>
+{% if type_name == 'Armor' %}
+            <th>Piercing Defense</th>
+            <th>Impact Defense</th>
+            <th>Energy Defense</th>
+{% elif type_name == 'Weapon' %}
+            <th>Accuracy</th>
+            <th>Hand-to-hand</th>
+            <th>Range</th>
+            <th>Type</th>
+            <th>Piercing Damage</th>
+            <th>Impact Damage</th>
+            <th>Energy Damage</th>
+{% endif %}
         </tr>
     </thead>
     <tbody>
@@ -20,10 +33,36 @@
             <td>{{item.tier}}</td>
             <td>{{item.rarity.name}}</td>
             <td>{{item.mass_kg | round(2)}}</td>
+{% if type_name == 'Armor' %}
+    {% set armor_aspect = item.aspect_armor %}
+    {% if armor_aspect %}
+            <td>{{armor_aspect.piercing_defense|round(2)}}</td>
+            <td>{{armor_aspect.impact_defense|round(2)}}</td>
+            <td>{{armor_aspect.energy_defense|round(2)}}</td>
+    {% else %}
+            <td></td> <td></td> <td></td>
+    {% endif %}
+{% elif type_name == 'Weapon' %}
+    {% set aspect_weapon = item.aspect_weapon %}
+    {% if aspect_weapon %}
+            <td>{{aspect_weapon.accuracy|round(3)}}</td>
+            <td>{{aspect_weapon.hand_to_hand}}</td>
+            <td>{{aspect_weapon.weapon_range.name}}</td>
+            <td>{{aspect_weapon.weapon_type.name}}</td>
+            <td>{{aspect_weapon.piercing_damage|round(2)}}</td>
+            <td>{{aspect_weapon.impact_damage|round(2)}}</td>
+            <td>{{aspect_weapon.energy_damage|round(2)}}</td>
+    {% else %}
+            <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td>
+    {% endif %}
+{% endif %}
         </tr>
 {% endfor %}
     </tbody>
 </table>
+
+{% from 'macros.html' import tablesorter %}
+{{ tablesorter('.sortable') }}
 
 {% endblock %}
 
