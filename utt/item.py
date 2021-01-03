@@ -28,7 +28,6 @@ def item_aspect_armor(item, attributes):
     required = ('piercing_defense', 'impact_defense', 'energy_defense')
     for attr in required:
         if attributes.get(attr) is None:
-            print('No attribute {}, so not an armor'.format(attr))
             return
 
     modified_attributes = {k: float(attributes[k]) for k in required}
@@ -44,7 +43,6 @@ def item_aspect_medical(item, attributes):
                 'social_boost', 'base_toxicity')
     for attr in required:
         if attributes.get(attr) is None:
-            print('No attribute {}, so not a medical'.format(attr))
             return
 
     modified_attributes = {k: float(attributes[k]) for k in required}
@@ -59,7 +57,6 @@ def item_aspect_food(item, attributes):
     required = ("target_genotype", "affected_stat", "effect_size", "duration_segments")
     for attr in required:
         if attributes.get(attr) is None:
-            print('No attribute {}, so not a food'.format(attr))
             return
 
     modified_attributes = dict(
@@ -85,7 +82,6 @@ def item_aspect_weapon(item, attributes):
                 'piercing_damage', 'impact_damage', 'energy_damage')
     for attr in required:
         if attributes.get(attr) is None:
-            print('No attribute {}, so not a weapon'.format(attr))
             return
 
     modified_attributes = dict(
@@ -114,6 +110,7 @@ def item_add():
     payload = request.get_json(force=True)
     token = Token.verify(payload['token'])
     token.record_script_version(payload.get('script_version'))
+    print('Item {} submitted by {}'.format(payload['name'], token.character.name))
     item = autovivify(Item, {
         'token': token,
         'name': payload['name'],

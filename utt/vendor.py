@@ -33,6 +33,8 @@ def add_vendory_inventory():
     station = get_station(payload['system'], payload['station'])
     vendor_name = payload['vendor']
 
+    print('Vendor {} at {} submitted by {}'.format(vendor_name, station.short or station.id, token.character.name))
+
     vendor = Vendor.query.filter_by(station_id=station.id, name=vendor_name).first()
     if not vendor:
         messages.append('Vendor created.')
