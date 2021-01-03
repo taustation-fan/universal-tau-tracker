@@ -460,17 +460,22 @@ class Item(db.Model):
 
     @property
     def min_vendor_price_reading(self):
-        return VendorItemPriceReading.query.filter_by(item_id=self.id).order_by(
-            VendorItemPriceReading.price_credits.asc(),
-            VendorItemPriceReading.price_bonds.asc(),
-        ).first()
+        return VendorItemPriceReading.query.join('vendor_inventory') \
+            .filter(VendorItemPriceReading.item_id == self.id).filter(VendorInventory.is_current == True) \
+            .order_by(
+                VendorItemPriceReading.price_credits.asc(),
+                VendorItemPriceReading.price_bonds.asc(),
+            ).first()
 
     @property
     def max_vendor_price_reading(self):
-        return VendorItemPriceReading.query.filter_by(item_id=self.id).order_by(
-            VendorItemPriceReading.price_credits.desc(),
-            VendorItemPriceReading.price_bonds.desc(),
-        ).first()
+        return VendorItemPriceReading.query.join('vendor_inventory') \
+            .filter(VendorItemPriceReading.item_id == self.id).filter(VendorInventory.is_current == True) \
+            .order_by(
+                VendorItemPriceReading.price_credits.desc(),
+                VendorItemPriceReading.price_bonds.desc(),
+            ).first()
+
 class ItemAspectWeapon(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
