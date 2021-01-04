@@ -13,3 +13,11 @@
     });
     </script>
 {% endmacro %}
+
+{% macro link_item(item) %}
+<a href="/item/detail/{{item.id}}">{{item.name}}</a>
+{% endmacro %}
+
+{% macro link_vendor(vendor) %}
+<a href="/vendor/detail/{{vendor.id}}">{{vendor.name}}</a>
+{% endmacro %}

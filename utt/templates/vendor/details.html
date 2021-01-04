@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Tau Station: Vendor {{vendor.name|escape}}{% endblock %}
+{% block content %}
+
+{% from 'macros.html' import link_item, tablesorter %}
+
+<h1>Vendor {{vendor.name|escape}} on {{vendor.station.name}}, {{vendor.station.system.name | escape }} system</h1>
+
+{% set inv = vendor.current_inventory %}
+
+{% if inv %}
+
+<h2>Inventory</h2>
+<table class="sortable">
+    <thead>
+        <tr>
+            <th>Item</th>
+            <th>Item Type</th>
+            <th>Item Tier</th>
+            <th>Min Price</th>
+            <th>Max Price</th>
+            <th>Last Price</th>
+            <th>Last Price Date</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for inv_item in inv.inventory_items %}
+    {% set item = inv_item.item %}
+    {% set min_price = inv.min_price_for(item) %}
+    {% set max_price = inv.max_price_for(item) %}
+    {% set last_price = inv.last_price_for(item) %}
+        <tr>
+            <td>{{ link_item(item) }}</td>
+            <td>{{ item.item_type.name | escape }}</td>
+            <td>{{ item.tier }}</td>
+            <td>{% if min_price %}{{ min_price.price_with_unit }}{% endif %}</td>
+            <td>{% if max_price %}{{ max_price.price_with_unit }}{% endif %}</td>
+        {% if last_price %}
+            <td>{{ last_price.price_with_unit }}</td>
+            <td>{{ last_price.day }}</td>
+        {% else %}
+            <td></td><td></td>
+        {% endif %}
+        <tr>
+
+{% endfor %}
+    </tbody>
+</table>
+{{ tablesorter('.sortable') }}
+
+{% else %}
+No current inventory data available.
+{% endif %}
+
+{% endblock %}
+

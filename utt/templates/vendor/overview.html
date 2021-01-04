@@ -1,7 +1,8 @@
 {% extends "base.html" %}
-{% block title %}Tau Station: Items{% endblock %}
+{% block title %}Tau Station: Vendors{% endblock %}
 {% block content %}
 
+{% from 'macros.html' import link_vendor, tablesorter %}
 <h1>Vendors</h1>
 
 <table class="sortable">
@@ -15,7 +16,7 @@
     <tbody>
 {% for vendor in vendors %}
         <tr>
-            <td>{{ vendor.name | escape }}</td>
+            <td>{{ link_vendor(vendor) }}</td>
             <td>{{ vendor.station.name | escape }}</td>
             <td>{{ vendor.station.system.name | escape }}</td>
         </tr>
@@ -23,7 +24,6 @@
     </tbody>
 </table>
 
-{% from 'macros.html' import tablesorter %}
 {{ tablesorter('.sortable') }}
 
 

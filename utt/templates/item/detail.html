@@ -2,6 +2,7 @@
 {% block title %}Tau Station: Item {{item.name|escape}}{% endblock %}
 {% block content %}
 
+{% from 'macros.html' import link_vendor %}
 <h1>{{item.name|escape}}</h1>
 
 <table>
@@ -162,7 +163,7 @@
     <tbody>
         {% for iv in inventories %}
             <tr>
-                <td>{{ iv.vendor.name | escape }}</td>
+                <td>{{ link_vendor(iv.vendor) }}</td>
                 <td>{{ iv.vendor.station.short or iv.vendor.station.name | escape}}</td>
                 {% set min_reading = iv.min_price_for(item) %}
                 {% if min_reading %}

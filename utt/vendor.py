@@ -132,5 +132,9 @@ def add_vendory_inventory():
 @app.route('/vendor')
 def vendor_overview():
     vendors = Vendor.query.join(Station, System).order_by(System.rank, Station.level, Station.name, Vendor.name)
-
     return render_template('vendor/overview.html', vendors=vendors)
+
+@app.route('/vendor/detail/<id>')
+def vendor_details(id):
+    vendor = Vendor.query.filter_by(id=int(id)).one()
+    return render_template('vendor/details.html', vendor=vendor)

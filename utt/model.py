@@ -583,6 +583,10 @@ class Vendor(db.Model):
         db.UniqueConstraint('station_id', 'name'),
     )
 
+    @property
+    def current_inventory(self):
+        return VendorInventory.query.filter_by(is_current=True, vendor_id=self.id).order_by(VendorInventory.last_seen.desc()).first()
+
 class VendorInventory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     vendor_id = db.Column(db.ForeignKey('vendor.id'), nullable=False)
@@ -608,6 +612,10 @@ class VendorInventory(db.Model):
         return VendorItemPriceReading.query.filter_by(vendor_inventory_id=self.id, item_id=item.id).order_by(
             VendorItemPriceReading.price_credits.desc(),
             VendorItemPriceReading.price_bonds.desc(),
+        ).first()
+    def last_price_for(self, item):
+        return VendorItemPriceReading.query.filter_by(vendor_inventory_id=self.id, item_id=item.id).order_by(
+            VendorItemPriceReading.day.desc()
         ).first()
     
 
