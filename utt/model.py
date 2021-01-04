@@ -468,6 +468,16 @@ class Item(db.Model):
             ).exists()
         )
 
+class ItemComment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    item_id = db.Column(db.ForeignKey('item.id'), nullable=False, unique=True)
+    item = db.relationship('Item', backref='comments')
+    token_id = db.Column(db.ForeignKey('token.id'), nullable=False)
+    token = db.relationship('Token')
+
+    comment = db.Column(db.Text, nullable=False)
+
 class ItemAspectWeapon(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
@@ -617,7 +627,7 @@ class VendorInventory(db.Model):
         return VendorItemPriceReading.query.filter_by(vendor_inventory_id=self.id, item_id=item.id).order_by(
             VendorItemPriceReading.day.desc()
         ).first()
-    
+
 
 class VendorInventoryItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)

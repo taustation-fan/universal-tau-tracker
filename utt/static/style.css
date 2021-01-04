@@ -63,3 +63,11 @@ ul.subnav li {
     list-style-position: outside;
 }
 
+section.comment {
+    margin-top: 2ex;
+    padding: 1ex;
+    border-style: dashed;
+    border-color: black;
+    border-width: 2px;
+
+}

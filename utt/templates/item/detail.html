@@ -144,6 +144,19 @@
     </tbody>
 </table>
 
+{% set comments = item.comments %}
+{% if comments %}
+<h2>Comments</h2>
+
+{% for comment in comments %}
+    <section class="comment">
+        <b>Submitted by <i>{{ comment.token.character.name | escape }}</i>:</b>
+        <p>{{ comment.comment | escape }}</p>
+    </section>
+{% endfor %}
+
+{% endif %}
+
 <h2>Vendor Availability</h2>
 
 {% set inventories = item.current_inventories %}
