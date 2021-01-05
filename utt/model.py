@@ -475,6 +475,7 @@ class ItemComment(db.Model):
     item = db.relationship('Item', backref='comments')
     token_id = db.Column(db.ForeignKey('token.id'), nullable=False)
     token = db.relationship('Token')
+    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     comment = db.Column(db.Text, nullable=False)
 
