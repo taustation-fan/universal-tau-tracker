@@ -4,7 +4,7 @@
 
 {% from 'macros.html' import link_item, tablesorter %}
 
-<h1>Vendor {{vendor.name|escape}} on {{vendor.station.name}}, {{vendor.station.system.name | escape }} system</h1>
+<h1>Vendor <i>{{vendor.name|escape}}</i> on {{vendor.station.name}}, {{vendor.station.system.name | escape }} system</h1>
 
 {% set inv = vendor.current_inventory %}
 
