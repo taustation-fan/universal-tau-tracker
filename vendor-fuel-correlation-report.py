@@ -93,6 +93,7 @@ with app.app_context():
                 print('        day {} looks good, have price readings for all items'.format(day))
                 price_per_g = np.median([fpr.price_per_g for fpr in fpr_by_date[day]])
                 station_data['fuel_price_per_g'] = price_per_g;
+                station_data['inventory_timestamp'] = str(first_date)
                 station_data['day'] = str(day)
                 station_data['vendors'] = {}
                 for iv in ivs:
