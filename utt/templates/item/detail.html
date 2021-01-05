@@ -167,7 +167,7 @@
 
 {% set inventories = item.current_inventories %}
 
-{% if inventories %}
+{% if inventories.count() %}
 <table>
     <thead>
         <tr>
