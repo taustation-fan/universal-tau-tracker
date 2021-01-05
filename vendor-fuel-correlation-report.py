@@ -53,6 +53,13 @@ with app.app_context():
     records = []
 
     for station, ivs in by_station.items():
+        station_data = {
+            'station': {
+                'name': station.name,
+                'system': station.system.name,
+                'short': station.short,
+            }
+        }
         first_date = max_dt([iv.first_seen for iv in ivs])
         
         fuel_price_readings = FuelPriceReading.query.filter(
@@ -85,16 +92,9 @@ with app.app_context():
             if has_full_prices:
                 print('        day {} looks good, have price readings for all items'.format(day))
                 price_per_g = np.median([fpr.price_per_g for fpr in fpr_by_date[day]])
-                station_data = {
-                    'station': {
-                        'name': station.name,
-                        'system': station.system.name,
-                        'short': station.short,
-                    },
-                    "fuel_price_per_g": price_per_g,
-                    "day": str(day),
-                    "vendors": {},
-                }
+                station_data['fuel_price_per_g'] = price_per_g;
+                station_data['day'] = str(day)
+                station_data['vendors'] = {}
                 for iv in ivs:
                     item_ids = [ii.item_id for ii in iv.inventory_items]
                     qry = VendorItemPriceReading.query.filter(
@@ -105,6 +105,9 @@ with app.app_context():
                     prices = {vipr.item.slug: vipr.price_credits for vipr in qry.all() if vipr.price_credits is not None}
                     station_data['vendors'][iv.vendor.name] = prices
                         
-                records.append(station_data)
                 break
+        
+        if 'vendors' not in station_data:
+            station_data['missing_data'] = True;
+        records.append(station_data)
     json.dump(records, sys.stdout, indent=4, sort_keys=True)
