@@ -144,6 +144,12 @@
     </tbody>
 </table>
 
+{% if item.description %}
+<h2>Description</h2>
+<p>{{ item.description | escape }}</p>
+
+{% endif %}
+
 {% set comments = item.comments %}
 {% if comments %}
 <h2>Comments</h2>
