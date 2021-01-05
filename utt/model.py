@@ -8,7 +8,7 @@ from utt.util import today
 db = SQLAlchemy()
 
 class InvalidTokenException(Exception):
-    def __init__():
+    def __init__(_=None):
         super().__init__('You need a valid token')
 
 
@@ -471,7 +471,7 @@ class Item(db.Model):
 class ItemComment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    item_id = db.Column(db.ForeignKey('item.id'), nullable=False, unique=True)
+    item_id = db.Column(db.ForeignKey('item.id'), nullable=False)
     item = db.relationship('Item', backref='comments')
     token_id = db.Column(db.ForeignKey('token.id'), nullable=False)
     token = db.relationship('Token')

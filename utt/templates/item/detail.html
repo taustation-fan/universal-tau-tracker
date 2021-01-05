@@ -151,17 +151,78 @@
 {% endif %}
 
 {% set comments = item.comments %}
-{% if comments %}
 <h2>Comments</h2>
 
 {% for comment in comments %}
-    <section class="comment">
+    <section class="comment" id="comment-{{comment.id}}">
         <b>Submitted by <i>{{ comment.token.character.name | escape }}</i>:</b>
         <p>{{ comment.comment | escape }}</p>
     </section>
 {% endfor %}
 
+{% if not comments %}
+    <p>No comments yet.</p>
 {% endif %}
+
+<h3>Add Your Own Comment</h3>
+
+<p>To add a comment, you need the same token as you need for the userscript. If you don't have one, request one <a href="https://taustation.space/email/write/moritz">by in-game mail to moritz</a>.</p>
+
+<form action="#">
+    <p id="form-message"></p>
+    <table>
+        <tr>
+            <td><label for="token">Token:</label></td>
+            <td><input name="token" id="form-token" required></input></td>
+        </tr>
+        <tr>
+            <td><label for="comment">Comment:</label></td>
+            <td><input name="comment" id="form-comment" required></textarea></td>
+        </tr>
+    </table>
+    <button id="form-submit">Submit</button>
+</form>
+
+ <script src="/static/jquery-3.3.1.min.js"></script>
+<script type="text/javascript">
+    $('#form-submit').click(function() {
+        $('#form-message').html('');
+        let errors = [];
+        let token = $('#form-token').val().trim();
+        let comment = $('#form-comment').val().trim();
+        if (!token) {
+            errors.push('Missing token.')
+        }
+        if (!comment) {
+            errors.push('Missing comment.')
+        }
+        if (errors.length) {
+            $('#form-message').html(errors.join("<br>"));
+            return false;
+        }
+        $('#form-submit').prop('disabled', true);
+        console.log('request now');
+        $.ajax({
+            type: 'POST',
+            url: '/v1/item/add-comment',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: JSON.stringify({token: token, comment: comment, item: {{item.id}}}),
+            success: function(data) {
+                if (data.success) {
+                    $('#form-message').html('Comment saved, reloading in 2s to show it')
+                    window.setTimeout( function () { location.reload() }, 2000 );
+                }
+                else {
+                    $('#form-message').html('Error while saving comment: ' + data.message);
+                    $('#form-submit').prop('disabled', false);
+                }
+            },
+        });
+            
+        return false;
+    });
+</script>
 
 <h2>Vendor Availability</h2>
 

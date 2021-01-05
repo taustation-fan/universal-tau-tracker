@@ -13,7 +13,9 @@ from utt.model import (
     Token,
     FoodEffectSize,
     Genotype,
+    InvalidTokenException,
     Item,
+    ItemComment,
     ItemType,
     ItemRarity,
     ItemAspectArmor,
@@ -183,3 +185,15 @@ def item_list_by_type(type_name):
 def item_overview():
     rs = Item.query.join('item_type').with_entities(ItemType.name, func.count()).group_by(ItemType.name).order_by(ItemType.name.asc())
     return render_template('item/overview.html', types=rs)
+
+@app.route('/v1/item/add-comment', methods=['POST'])
+def add_item_comment():
+    payload = request.get_json(force=True)
+    try:
+        token = Token.verify(payload['token'])
+    except InvalidTokenException:
+        return jsonify({"success": False, "message": "invalid token."})
+    item = Item.query.filter_by(id=payload['item']).one()
+    db.session.add(ItemComment(token=token, comment=payload['comment'], item=item))
+    db.session.commit()
+    return jsonify({'success': True})
