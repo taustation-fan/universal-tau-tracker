@@ -27,6 +27,12 @@ from utt.model import (
 )
 from utt import app
 
+def min_dt(dts):
+    current = dts.pop(0)
+    for item in dts:
+        if item < current:
+            current = item
+    return current
 def max_dt(dts):
     current = dts.pop(0)
     for item in dts:
@@ -56,6 +62,7 @@ def fuel_vendor_correlation():
             }
         }
         first_date = max_dt([iv.first_seen for iv in ivs])
+        last_date = min_dt([iv.last_seen for iv in ivs])
         
         fuel_price_readings = FuelPriceReading.query.filter(
             FuelPriceReading.station_id == station.id,
@@ -94,7 +101,8 @@ def fuel_vendor_correlation():
             if has_full_prices:
                 price_per_g = np.median([fpr.price_per_g for fpr in fpr_by_date[day]])
                 station_data['fuel_price_per_g'] = price_per_g;
-                station_data['inventory_timestamp'] = str(first_date)
+                station_data['inventory_first_seen'] = str(first_date)
+                station_data['inventory_last_seen'] = str(last_date)
                 station_data['day'] = str(day)
                 station_data['vendors'] = {}
                 for iv in ivs:
