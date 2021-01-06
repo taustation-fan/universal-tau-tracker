@@ -7,6 +7,7 @@ import utt.contributor
 import utt.station
 import utt.item
 import utt.vendor
+import utt.special
 
 if __name__ == '__main__':
     app.run(debug=True)

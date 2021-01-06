@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 This script tries to output information that can be used to derive a fuel price estimation model
 based on item prices.
@@ -14,11 +13,11 @@ This script takes the most recent day which satisfies these constraints, and pro
     * per vendor, the prices (only credit prices) for all items (by slug)
 
 """
-import sys
+from utt.app import app
 import pytz
 import numpy as np
-import json
 from datetime import date
+from flask import request, jsonify, render_template, abort
 
 from collections import defaultdict
 from utt.model import (
@@ -28,12 +27,6 @@ from utt.model import (
 )
 from utt import app
 
-def min_dt(dts):
-    current = dts.pop(0)
-    for item in dts:
-        if item < current:
-            current = item
-    return current
 def max_dt(dts):
     current = dts.pop(0)
     for item in dts:
@@ -44,8 +37,9 @@ def max_dt(dts):
 tz = pytz.timezone('Europe/Paris')
 
 
-with app.app_context():
-    debug = 1
+@app.route('/v1/special/fuel-vendor-correlation')
+def fuel_vendor_correlation():
+    debug = bool( request.args.get('debug') )
     inventories = VendorInventory.query.filter_by(is_current=True)
     by_station = defaultdict(list)
     for iv in inventories:
@@ -82,7 +76,8 @@ with app.app_context():
             fpr_by_date[day].append(f)
         # check for which of he days we have price readings for *all* items from vendors
         for day in sorted(fpr_by_date.keys(), reverse=True):
-            station_data['debug']['by_day'][str(day)] = {}
+            if debug:
+                station_data['debug']['by_day'][str(day)] = {}
             has_full_prices = True
             for iv in ivs:
                 item_ids = [ii.item_id for ii in iv.inventory_items]
@@ -92,7 +87,8 @@ with app.app_context():
                     VendorItemPriceReading.day == day,
                 )
                 if qry.count() != len(item_ids):
-                    station_data['debug']['by_day'][str(day)][iv.vendor.name] = 'incomplete price readings'
+                    if debug:
+                        station_data['debug']['by_day'][str(day)][iv.vendor.name] = 'incomplete price readings'
                     has_full_prices = False
                     break
             if has_full_prices:
@@ -116,4 +112,4 @@ with app.app_context():
         if 'vendors' not in station_data:
             station_data['missing_data'] = True;
         records.append(station_data)
-    json.dump(records, sys.stdout, indent=4, sort_keys=True)
+    return jsonify(records)
