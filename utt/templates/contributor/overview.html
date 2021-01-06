@@ -19,6 +19,9 @@ so numbers are not comparable across categories.</p>
             <th class="right">Fuel</br>price</th>
             <th class="right">Ship<br>positions</th>
             <th class="right">Items</th>
+            <th class="right">Item Comments</th>
+            <th class="right">Vendor Inventories</th>
+            <th class="right">Vendor Prices</th>
             <th class="right">Script<br>version</th>
         </tr>
     </thead>
@@ -31,6 +34,9 @@ so numbers are not comparable across categories.</p>
                 <td class="right">{{ contributors[c].get('fuel', 0) }}</td>
                 <td class="right">{{ contributors[c].get('ship', 0) }}</td>
                 <td class="right">{{ contributors[c].get('item', 0) }}</td>
+                <td class="right">{{ contributors[c].get('item_comment', 0) }}</td>
+                <td class="right">{{ contributors[c].get('vendor_inventory', 0) }}</td>
+                <td class="right">{{ contributors[c].get('vendor_price', 0) }}</td>
                 <td class="right">{{ contributors[c].get('last_script_version', '') }}</td>
             </tr>
 

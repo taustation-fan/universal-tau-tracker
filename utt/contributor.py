@@ -8,8 +8,11 @@ from utt.model import db, \
     Character, \
     FuelPriceReading, \
     Item, \
+    ItemComment, \
     ShipSighting, \
     StationDistanceReading, \
+    VendorInventory, \
+    VendorItemPriceReading, \
     Token
 
 @app.route('/contributor')
@@ -27,6 +30,9 @@ def contributor_statistics():
         ('ship', ShipSighting),
         ('distance', StationDistanceReading),
         ('item', Item),
+        ('item_comment', ItemComment),
+        ('vendor_inventory', VendorInventory),
+        ('vendor_price', VendorItemPriceReading),
     )
     
     for name, model in pairs:
