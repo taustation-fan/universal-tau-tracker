@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Tau Station: Items{% endblock %}
+{% block content %}
+{% from 'macros.html' import link_item, tablesorter %}
+
+<h1>Item Comments</h1>
+
+
+<table class="sortable">
+    <thead>
+        <tr>
+            <th>Author</th>
+            <th>Item</th>
+            <th>Date/Time</th>
+            <th>Comment</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for comment in comments %}
+    <tr>
+        <td>{{ comment.token.character.name | escape }}</td>
+        <td>{{ link_item(comment.item) }}, Tier {{ comment.item.tier }} {{ comment.item.item_type.name | escape }}</td>
+        <td>{{ comment.created }}</td>
+        <td>{{ comment.comment | escape }}</td>
+    </tr>
+{% endfor %}
+    </tbody>
+</table>
+
+{{ tablesorter('.sortable') }}
+{% endblock %}
+

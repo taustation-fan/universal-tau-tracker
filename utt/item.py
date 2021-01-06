@@ -197,3 +197,7 @@ def add_item_comment():
     db.session.add(ItemComment(token=token, comment=payload['comment'], item=item))
     db.session.commit()
     return jsonify({'success': True})
+
+@app.route('/item/comment')
+def item_comments():
+    return render_template('item/comments.html', comments=ItemComment.query.order_by(ItemComment.created.desc()))
