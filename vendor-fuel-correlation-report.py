@@ -45,6 +45,7 @@ tz = pytz.timezone('Europe/Paris')
 
 
 with app.app_context():
+    debug = 1
     inventories = VendorInventory.query.filter_by(is_current=True)
     by_station = defaultdict(list)
     for iv in inventories:
@@ -66,7 +67,12 @@ with app.app_context():
             FuelPriceReading.station_id == station.id,
             FuelPriceReading.when >= first_date,
         ).order_by(FuelPriceReading.when.desc())
-        print("Working on station {}, processing from {}, with {} fuel price readings".format(station.short or station.name, first_date, fuel_price_readings.count()))
+        if debug:
+            station_data['debug'] = {
+                'start_date': str(first_date),
+                'fuel_price_readings_count': fuel_price_readings.count(),
+                'by_day': {}
+            }
 
         # check for which days we have fuel price readings
         fpr_by_date = defaultdict(list)
@@ -76,7 +82,7 @@ with app.app_context():
             fpr_by_date[day].append(f)
         # check for which of he days we have price readings for *all* items from vendors
         for day in sorted(fpr_by_date.keys(), reverse=True):
-            print('    considering day {}'.format(day))
+            station_data['debug']['by_day'][str(day)] = {}
             has_full_prices = True
             for iv in ivs:
                 item_ids = [ii.item_id for ii in iv.inventory_items]
@@ -86,11 +92,10 @@ with app.app_context():
                     VendorItemPriceReading.day == day,
                 )
                 if qry.count() != len(item_ids):
-                    print('         vendor {}: incomplete price readings for day {}'.format(iv.vendor.name, day))
+                    station_data['debug']['by_day'][str(day)][iv.vendor.name] = 'incomplete price readings'
                     has_full_prices = False
                     break
             if has_full_prices:
-                print('        day {} looks good, have price readings for all items'.format(day))
                 price_per_g = np.median([fpr.price_per_g for fpr in fpr_by_date[day]])
                 station_data['fuel_price_per_g'] = price_per_g;
                 station_data['inventory_timestamp'] = str(first_date)
