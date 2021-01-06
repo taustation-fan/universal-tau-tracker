@@ -116,3 +116,21 @@ URL: `v1/item/list.json`
 Get a list of all items as JSON.
 
 TBD: this might need some adapting when more items are known.
+
+### Special: Correlation Between Fuel Prices and Vendor Item Prices
+
+URL: `/v1/special/fuel-vendor-correlation`
+
+Example: <https://tracker.tauguide.de/v1/special/fuel-vendor-correlation>
+
+Optional URL argument: `debug=1`
+
+This returns a list of stations with known NPC vendors.
+
+For each station, it tries to find a day for which there are both price
+records for all items and a fuel price reading from the docks. If it does,
+it returns the day, the fuel price per gram for that day, and for each
+vendor the mapping from item slug to price.
+
+Note that only items that are available for credits are considered for
+this report.
