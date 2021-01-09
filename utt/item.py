@@ -133,7 +133,7 @@ def item_add():
     response = {
         'id': item.id,
         'recorded': True,
-        'message': '',
+        'message': '<a href="https://tracker.tauguide.de/item/detail/{}">this item on the tracker</a>'.format(item.id),
     }
 
     return jsonify(response)
