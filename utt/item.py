@@ -154,6 +154,10 @@ def item_by_slug(slug):
 @app.route('/v1/item/by-name/<name>')
 def item_by_name(name):
     item = Item.query.filter_by(name=name).first()
+    if not item:
+        item = Item.query.filter(
+            func.lower(Item.name) == name.lower()
+        ).first()
     if item:
         return jsonify(item.as_json())
     else:

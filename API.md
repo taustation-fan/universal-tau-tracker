@@ -109,6 +109,10 @@ Examples:
 * <https://tracker.tauguide.de/v1/item/by-slug/vip-3>
 * <https://tracker.tauguide.de/v1/item/by-name/Magnus%20Burnshield>
 
+The `by-name` endpoint first tries to find an exact match, and if there is none,
+falls back to a case insensitive comparison, so 
+<https://tracker.tauguide.de/v1/item/by-name/magnus%20burnshield> works as well.
+
 ### Listing Items
 
 URL: `v1/item/list.json`
