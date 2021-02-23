@@ -67,21 +67,22 @@ def add_vendory_inventory():
     latest_inventory = VendorInventory.query.filter_by(vendor_id=vendor.id, is_current=True) \
         .order_by(VendorInventory.last_seen.desc()).first()
 
+    has_current_inventory = False
     if latest_inventory:
         if  latest_inventory.item_slugs == slugs:
+            has_current_inventory = True
             # inventory still up to date
             latest_inventory.last_seen = new_timestamp
             messages.append('Updated inventory timestamp.')
         else:
             latest_inventory.is_current = False
-    else:
+    if not has_current_inventory:
         latest_inventory = VendorInventory(
             token=token,
             vendor=vendor,
             first_seen=new_timestamp,
             last_seen=new_timestamp,
         )
-        messages.append('New inventory state recorded.')
         db.session.add(latest_inventory)
         for item in items.values():
             db.session.add(VendorInventoryItem(
@@ -95,12 +96,12 @@ def add_vendory_inventory():
         return (float(v), None) if d['currency'] == 'credits' else (None, int(v))
 
     existing_prices = {vipr.item.slug: vipr for vipr in 
-        VendorItemPriceReading.query.filter_by(vendor_id=vendor.id, day=day)}
+        VendorItemPriceReading.query.filter_by(vendor_inventory_id=latest_inventory.id, day=day)}
 
     prices_updated = False
     for d in payload['inventory']:
         slug = d['slug']
-        if slug == 'vip-3':
+        if slug in vendor_blacklist:
             continue
         credits, bonds = price_tuple(d)
         if slug in existing_prices:
@@ -111,7 +112,7 @@ def add_vendory_inventory():
                 record.price_bonds = bonds
                 record.token = token
         else:
-            db.session.add(VendorItemPriceReading(
+            vipr = VendorItemPriceReading(
                 token=token,
                 vendor=vendor,
                 vendor_inventory=latest_inventory,
@@ -119,7 +120,8 @@ def add_vendory_inventory():
                 day=day,
                 price_credits=credits,
                 price_bonds=bonds,
-            ))
+            )
+            db.session.add(vipr)
             prices_updated = True
 
     if prices_updated:
