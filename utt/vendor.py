@@ -20,6 +20,8 @@ from utt.model import (
     VendorItemPriceReading,
 )
 
+vendor_blacklist = {'vip-3'} | {'ration-{}'.format(i) for i in range(1, 11)}
+
 def linkify(item_slug):
     # TODO: protect against cross-site scripting
     return '<a href="https://taustation.space/item/{}">{}</a>'.format(item_slug, item_slug)
@@ -46,9 +48,7 @@ def add_vendory_inventory():
         )
         db.session.add(vendor)
 
-    slugs = {iv['slug'] for iv in payload['inventory']}
-    if 'vip-3' in slugs:
-        slugs.remove('vip-3')
+    slugs = {iv['slug'] for iv in payload['inventory']} - vendor_blacklist
 
     items = {item.slug: item for item in Item.query.filter(Item.slug.in_(sorted(slugs)))}
     missing = [slug for slug in slugs if not slug in items]
