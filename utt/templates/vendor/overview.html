@@ -2,7 +2,7 @@
 {% block title %}Tau Station: Vendors{% endblock %}
 {% block content %}
 
-{% from 'macros.html' import link_vendor, tablesorter %}
+{% from 'macros.html' import link_vendor, tablesorter, gct %}
 <h1>Vendors</h1>
 
 <table class="sortable">
@@ -11,6 +11,7 @@
             <th>Name</th>
             <th>Station</th>
             <th>System</th>
+            <th>Last updated</th>
         </tr>
     </thead>
     <tbody>
@@ -19,6 +20,8 @@
             <td>{{ link_vendor(vendor) }}</td>
             <td>{{ vendor.station.name | escape }}</td>
             <td>{{ vendor.station.system.name | escape }}</td>
+            <td>{% set current_inventory = vendor.current_inventory %}
+                {% if current_inventory %}{{ gct( current_inventory.last_seen ) }}{% endif %}</td>
         </tr>
 {% endfor %}
     </tbody>
