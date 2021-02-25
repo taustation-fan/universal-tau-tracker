@@ -37,6 +37,10 @@ class System(db.Model):
 
     __mapper_args__ = {'order_by': ['rank', 'name']}
 
+    @property
+    def stations_sorted(self):
+        return sorted(self.stations, key=lambda x: (x.level or 0, x.name))
+
 
 class Station(db.Model):
     id = db.Column(db.Integer, primary_key=True)

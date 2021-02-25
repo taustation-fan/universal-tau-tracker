@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block title %}Tau Station: Distances for {{ system_name }}{% endblock %}
+{% block title %}Tau Station: Distances for {{ system_name | escape }}{% endblock %}
 {% block content %}
 
-<h1>Distances for {{ system_name }}</h1>
+<h1>Current Distances for {{ system_name | escape }}</h1>
 
 <p>At time {{ gct }} GCT.</p>
 
@@ -15,7 +15,7 @@
         <tr>
             <th>Distance</th>
             {% for p in positions %}
-                <th>{{ p.station.name }}</th>
+                <th>{{ p.station.name | escape }}</th>
             {% endfor %}
         </tr>
     </thead>
@@ -29,6 +29,33 @@
             </tr>
         {% endfor %}
 
+    </tbody>
+</table>
+
+<h2 id="pairs">Station Pairs for {{ system_name | escape }}</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Station</th>
+            <th># Data Points</th>
+            <th>Relative period/u</th>
+            <th>Min distance/km</th>
+            <th>Max distance/km</th>
+            <th>Phase</th>
+        </tr>
+    <thead>
+    <tbody>
+        {% for name, pair in station_pairs.items()|sort(attribute='0'): %}
+            <tr>
+                <td><a href="{{ pair.url }}">{{ name }}</a></td>
+                <td class="right">{{ pair.count }}</th>
+                <td class="right">{{pair.fit_period_u | int if pair.fit_period_u }}</td>
+                <td class="right">{{pair.fit_min_distance_km | int if pair.fit_min_distance_km }}</td>
+                <td class="right">{{pair.fit_max_distance_km | int if pair.fit_max_distance_km }}</td>
+                <td class="right">{{pair.fit_phase|round(3) if pair.fit_phase }}</td>
+            </tr>
+        {% endfor %}
     </tbody>
 </table>
 

@@ -2,33 +2,27 @@
 {% block title %}Tau Station: Station Distance Recordings{% endblock %}
 {% block content %}
 
-<p>With {{ total }} data points so far. <a href="https://github.com/taustation-fan/universal-tau-tracker#readme">Help collecting data through a simple userscript!</a></p>
-
 <table>
     <thead>
         <tr>
             <th>Station</th>
-            <th># Data Points</th>
-            <th>Relative period/u</th>
-            <th>Min distance/km</th>
-            <th>Max distance/km</th>
-            <th>Phase</th>
+            <th>Radius/km</th>
+            <th>Orbital Period/u</th>
         </tr>
     <thead>
     <tbody>
 {% for system in systems %}
         <tr>
-            <th colspan="6"><a  href="{{ url_for('distance_system', system_id=system.id) }}">{{ system.name }}</a></th>
+            <th colspan="6"><a  href="{{ url_for('distance_system', system_id=system.id) }}">{{ system.name | escape }}</a></th>
         </tr>
-        {% for name, pair in system.station_pairs.items()|sort(attribute='0'): %}
+        {% for station in system.stations_sorted %}
             <tr>
-                <td><a href="{{ pair.url }}">{{ name }}</a></td>
-                <td class="right">{{ pair.count }}</th>
-                <td class="right">{{pair.fit_period_u | int if pair.fit_period_u }}</td>
-                <td class="right">{{pair.fit_min_distance_km | int if pair.fit_min_distance_km }}</td>
-                <td class="right">{{pair.fit_max_distance_km | int if pair.fit_max_distance_km }}</td>
-                <td class="right">{{pair.fit_phase|round(3) if pair.fit_phase }}</td>
+                <th class="left">{{ station.name | escape }}</th>
+                <td>{{ station.fit_radius_km | round(1) if station.fit_radius_km }}</td>
+                <td>{{ station.fit_period_u | int if station.fit_period_u }}</td>
+
             </tr>
+
         {% endfor %}
 {% endfor %}
     </tbody>

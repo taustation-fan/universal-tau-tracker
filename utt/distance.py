@@ -86,37 +86,29 @@ def add_distance():
     print('Recorded {} distance pairs ({} new) for {} by {}'.format(count, new, payload['source'], token.character.name))
     return jsonify({'recorded': True, 'message': 'Recorded {} distance pairs, of which {} were new. +1 brownie point'.format(count, new)})
 
+def get_station_pairs(system):
+    pairs = {}
+    for sp in StationPair.query.filter_by(system_id=system.id):
+        count = sp.readings_count
+        if count > 0:
+            pairs[str(sp)] = {
+                'id': sp.id,
+                'count': count,
+                'url': url_for('distance_pair', id=sp.id),
+                'has_fit': sp.has_full_fit,
+                'fit_period_u': sp.fit_period_u,
+                'fit_min_distance_km': sp.fit_min_distance_km,
+                'fit_max_distance_km': sp.fit_max_distance_km,
+                'fit_phase': sp.fit_phase,
+            }
+    return pairs
+
 @app.route('/distance')
 def distance_overview():
     station_pairs = defaultdict(dict)
 
-    total_count = 0;
-    systems = []
-    for system in System.query.order_by(System.rank, System.name):
-        system_dict = {
-            'id': system.id,
-            'name': system.name,
-            'station_pairs': {},
-        }
-        for sp in StationPair.query.filter_by(system_id=system.id):
-            count = sp.readings_count
-            if count > 0:
-                total_count += count
-                system_dict['station_pairs'][str(sp)] = {
-                    'id': sp.id,
-                    'count': count,
-                    'url': url_for('distance_pair', id=sp.id),
-                    'has_fit': sp.has_full_fit,
-                    'fit_period_u': sp.fit_period_u,
-                    'fit_min_distance_km': sp.fit_min_distance_km,
-                    'fit_max_distance_km': sp.fit_max_distance_km,
-                    'fit_phase': sp.fit_phase,
-                }
-        if system_dict['station_pairs']:
-            systems.append(system_dict)
-    if request.content_type == 'application/json':
-        return jsonify(station_pairs)
-    return render_template('distance_overview.html', systems=systems, total=total_count)
+    systems = System.query.order_by(System.rank, System.name).all()
+    return render_template('distance_overview.html', systems=systems)
 
 @app.route('/distance/pair/<id>')
 def distance_pair(id):
@@ -300,8 +292,10 @@ def distance_system(system_id):
     time = float(as_gct(dt, format=False))
     
     return render_template('distance_system.html',
+                           system=system,
                            system_name=system.name,
                            system_id=system.id,
+                           station_pairs=get_station_pairs(system),
                            u=time,
                            gct=as_gct(dt),
                            positions=get_positions(system, time),

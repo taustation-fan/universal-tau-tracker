@@ -28,6 +28,9 @@ canvas {
 .right {
     text-align: right;
 }
+.left {
+    text-align: left;
+}
 
 tr, td {
 	vertical-align: top;
