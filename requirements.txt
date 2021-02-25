@@ -1,3 +1,4 @@
+diskcache
 flask_sqlalchemy
 flask-cors
 gunicorn
