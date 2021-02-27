@@ -152,7 +152,7 @@ def find_most_common_number(l, ACCURACY=0.05):
     if len(winning_streak) == 1:
         # seems we have no similar numbers at all
         return None
-    if len(sorted_streaks) > 1 and len(winning_streak) == len(sorted_streaks[1]):
+    if len(sorted_streaks) > 1 and (len(winning_streak) - len(sorted_streaks[1])) < 3:
         # we have two clusters of similar numbers with the same size,
         # so don't assume we have a winner
         return None
