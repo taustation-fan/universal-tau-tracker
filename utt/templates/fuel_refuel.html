@@ -17,14 +17,14 @@
     </thead>
     <tbody>
         {% for row in rows %}
-            <tr>
+            <tr {% if row.classification %}class="classification-{{row.classification}}"{% endif %}>
                 <td>{{ row.station_short_name }}</td>
                 <td class="right">{% if row.last_price%}{{ row.last_price | round(1) }}{% endif %}</td>
                 <td class="right">{% if row.estimated_price%}{{ row.estimated_price | round(1) }}{% endif %}</td>
                 {% if compare %}
                     <td class="right">
-                        {% if row.last_price and row.estimated_price %}
-                            {{ ((row.last_price - row.estimated_price)|abs / row.last_price * 1000) | round(2) }}
+                        {% if row.error %}
+                            {{ row.error | round(2) }}
                         {% endif %}
                     </td>
                 {% endif %}

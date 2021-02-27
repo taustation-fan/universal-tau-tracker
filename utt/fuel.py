@@ -169,6 +169,18 @@ def fuel_lowest(token):
                 'last_price': measured.get(short),
                 'estimated_price': estimations.get(short), 
              } for short in all_short_names]
+    if compare:
+        for row in rows:
+            if row['last_price'] and row['estimated_price']:
+                error =  1000 * abs(row['last_price'] - row['estimated_price']) / row['estimated_price']
+                row['error'] = error
+                if error < 5:
+                    classification = 'good'
+                elif error < 20:
+                    classification = 'ok'
+                else:
+                    classification = 'bad'
+                row['classification'] = classification
     rows.sort(key=lambda r: r['last_price'] or r['estimated_price'])
 
     return render_template('fuel_refuel.html', rows=rows, compare=compare)

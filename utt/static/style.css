@@ -66,6 +66,11 @@ ul.subnav li {
     list-style-position: outside;
 }
 
+/* for fuel estimation classification */
+.classification-good { background-color: #90EE90; }
+.classification-ok   { background-color: #FFFFE0; }
+.classification-bad  { background-color: #EE9090; }
+
 section.comment {
     margin-top: 2ex;
     padding: 1ex;
