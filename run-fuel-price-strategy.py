@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
+
 import argparse
 import json
 import math
 import requests
 import sys
-import urllib.request
+from copy import deepcopy
 
 from bs4 import BeautifulSoup
 from sqlalchemy.orm.exc import NoResultFound
@@ -112,6 +113,14 @@ def entries_by_key(entries, key):
         collected_entries[k].append(e)
     return collected_entries
 
+
+def equals_approx(a, b, tolerance=1.0):
+    """
+    Returns True if a==b within the given absolute tolerance.
+    """
+    return abs(a-b) <= tolerance
+
+
 def median(numbers):
     """
     Returns the median of a list of already sorted numbers.
@@ -121,6 +130,7 @@ def median(numbers):
         return numbers[ l // 2 + 1]
     else:
         return (numbers[l // 2] + numbers[l // 2 + 1]) / 2
+
 
 def find_most_common_number(l, ACCURACY=0.05):
     """
@@ -176,7 +186,6 @@ class Interval:
 
     def guess(self):
         return find_most_common_number(self.prices_seen)
-        
 
     def length(self):
         return (self.max - self.min)
@@ -186,6 +195,8 @@ class Interval:
         return "[%.2f, %.2f]" % (self.min, self.max)
     def midpoint(self):
         return 0.5 * (self.min + self.max)
+    def contains(self, a):
+        return (a >= self.min - INTERVAL_THRESHOLD) and (a <= self.max + INTERVAL_THRESHOLD)
 
 
 def get_fuel_prices(cache, strategy_file=None):
@@ -194,9 +205,12 @@ def get_fuel_prices(cache, strategy_file=None):
             stations_json = json.load(f)
     else:
         url = "https://tracker.tauguide.de/v1/special/fuel-vendor-correlation"
-        with urllib.request.urlopen(url) as response:
-            stations_json = json.load(response)
+        req = requests.get(url)
+        if req.status_code != 200:
+            raise Exception('Cannot get {}: {}'.format(url, req.text))
+        stations_json = json.loads(req.text)
 
+    # read all entries
     entries = read_items(stations_json)
     if not entries:
         print("Not enough data, giving up")
@@ -208,6 +222,7 @@ def get_fuel_prices(cache, strategy_file=None):
 
     # get list of stations (having vendors), and entries available per station
     stations = set( e['Station'] for e in entries)
+    nstations = len(stations)
     entries_by_station = entries_by_key(entries, 'Station')
 
     # for each slug, get the list of stations where it is available
@@ -220,10 +235,17 @@ def get_fuel_prices(cache, strategy_file=None):
         available_on_station_by_slug[slug].add(station)
 
     # run over all stations
+    nconverged = 0
     fuelprice_by_station = {}
+    considered_slugs_by_station = {}
+    debug_print("### PHASE 1 ###")
     for station in stations:
 
         debug_print("STATION =", station)
+
+        # remember the slugs that are considered for fuel price prediction
+        considered_slugs_by_station[station] = []
+
         # collect vendor entries for this station
         station_entries = entries_by_station[station]
         # get items available on this station
@@ -258,6 +280,10 @@ def get_fuel_prices(cache, strategy_file=None):
                     continue # no new combination, move on to next item
                 station_combinations.append(station_combination)
 
+            # remember
+            considered_slugs_by_station[station].append(slug)
+
+            # update potential fuel price range
             fpc = station_entries_by_slug[slug][0]['FuelPriceCoefficient']
             itemprice_min, itemprice_max = get_minmax(cache, slug)
             fuelprice_min = itemprice_min / fpc
@@ -265,12 +291,102 @@ def get_fuel_prices(cache, strategy_file=None):
             fuelprice_interval.update(fuelprice_min, fuelprice_max)
             debug_print("  after '%s': fuelprice = %s" % (slug, fuelprice_interval))
             if fuelprice_interval.is_converged():
+                nconverged += 1
                 debug_print("  converged!")
                 break
 
         # store result
         fuelprice_by_station[station] = fuelprice_interval
-            
+
+    # run over all stations again, if necessary multiple times
+    iteration = 0
+    while nconverged < nstations:
+        iteration += 1
+        debug_print("### PHASE 2 # Iteration=%d ###" % iteration)
+        prev_nconverged = nconverged # to check progress
+
+        for station in stations:
+            # skip station if converged
+            if fuelprice_by_station[station].is_converged(): continue
+
+            debug_print("STATION =", station)
+
+            # get the current interval
+            fuelprice_interval = fuelprice_by_station[station]
+
+            for slug in considered_slugs_by_station[station]:
+                debug_print("  slug =", slug)
+                itemprice_min, itemprice_max = get_minmax(cache, slug)
+                debug_print("    itemprice range = %.2f — %.2f" % (itemprice_min, itemprice_max))
+
+                # keep track of which stations are compatible with the min/max itemprice
+                # the goal is to reduce either of them to just one station
+                stations_compatible_with_min = deepcopy( available_on_station_by_slug[slug] )
+                stations_compatible_with_max = deepcopy( available_on_station_by_slug[slug] )
+
+                # run over the other stations where this item is available
+                for other_station in available_on_station_by_slug[slug]:
+                    if other_station == station: continue
+                    if not fuelprice_by_station[other_station].is_converged():
+                        debug_print("    available on %s, but fuelprice not known" % other_station)
+                        continue
+                    # get other station's itemprice
+                    other_fuelprice = fuelprice_by_station[other_station].midpoint()
+                    other_station_entries = entries_by_station[other_station]
+                    other_station_entries_by_slug = entries_by_key(other_station_entries, 'slug')
+                    other_fpc = other_station_entries_by_slug[slug][0]['FuelPriceCoefficient']
+                    other_itemprice = other_fpc * other_fuelprice
+                    debug_print("    available on %s for %.2f" % (other_station, other_itemprice))
+                    # now check compatibility
+                    if not equals_approx(other_itemprice, itemprice_min):
+                        stations_compatible_with_min.remove(other_station)
+                    if not equals_approx(other_itemprice, itemprice_max):
+                        stations_compatible_with_max.remove(other_station)
+
+                # get this item's FPC on this station
+                station_entries = entries_by_station[station]
+                station_entries_by_slug = entries_by_key(station_entries, 'slug')
+                fpc = station_entries_by_slug[slug][0]['FuelPriceCoefficient']
+
+                fuelprice = None
+                # is the min price only compatible with one station? (it will be the current station)
+                if len(stations_compatible_with_min) == 1:
+                    assert(stations_compatible_with_min.pop() == station)
+                    itemprice = itemprice_min
+                    fuelprice = itemprice_min / fpc
+                    if not fuelprice_interval.contains(fuelprice):
+                        debug_print("    WARNING: min price %.2f only compatible here" % itemprice_min)
+                        debug_print("             but fuelprice %.2f not inside %s" % (fuelprice, fuelprice_interval))
+                        fuelprice = None
+
+                # same check for max price (unless resolved)
+                if (not fuelprice) and len(stations_compatible_with_max) == 1:
+                    assert(stations_compatible_with_max.pop() == station)
+                    itemprice = itemprice_max
+                    fuelprice = itemprice_max / fpc
+                    if not fuelprice_interval.contains(fuelprice):
+                        debug_print("    WARNING: max price %.2f only compatible here" % itemprice_max)
+                        debug_print("             but fuelprice %.2f not inside %s" % (fuelprice, fuelprice_interval))
+                        fuelprice = None
+
+                if (not fuelprice): continue # move on to next item
+                debug_print("    => itemprice here = %.2f" % itemprice)
+                debug_print("  => fuelprice = %.2f" % fuelprice)
+
+                # store result
+                nconverged += 1
+                fuelprice_interval.update(fuelprice, fuelprice)
+                # don't need to consider more items
+                break
+
+        # check progress
+        if nconverged == prev_nconverged:
+            # no :(
+            debug_print("no progress, giving up")
+            break
+
+    debug_print("resolved %d/%d stations after %d iterations" % (nconverged, nstations, iteration))
+
     # sort stations by fuelprice midpoint
     result = {}
     for station in sorted(stations, key = lambda station: fuelprice_by_station[station].midpoint() ):
