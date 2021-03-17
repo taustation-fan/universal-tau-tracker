@@ -9,6 +9,7 @@ from sqlalchemy import func
 
 from .app import app
 from utt.util import today_datetime, today
+from sqlalchemy.orm.exc import NoResultFound
 
 from utt.model import db, \
                       get_station, \
@@ -16,6 +17,7 @@ from utt.model import db, \
                       FuelPriceEstimation, \
                       FuelPriceReading, \
                       FuelPriceStatistics as FPS, \
+                      Station, \
                       System, \
                       InvalidTokenException
 from utt.gct import gct_duration
@@ -233,3 +235,26 @@ def export_fuel_estimation():
         }
     }
     return jsonify(result)
+
+@app.route('/v1/fuel_estimation/add', methods=['POST'])
+def fuel_estimation_add():
+    payload = request.get_json(force=True)
+    token = Token.verify(payload['token'])
+    stations = payload['stations']
+    date = today()
+    print('Recording fuel price estimations for {} from {}, token {}'.format(date, token.character.name, token.id))
+    FuelPriceEstimation.query.filter_by(day=date).delete()
+    for station_name, price in stations.items():
+        try:
+            station = Station.query.filter_by(name=station_name).one()
+            est = FuelPriceEstimation(
+                station=station,
+                day=date,
+                price_per_g=price,
+            ) 
+            db.session.add(est)
+        except NoResultFound:
+            print('  Found no station {}'.format(station_name))
+            
+    db.session.commit()
+    return jsonify({'recorded': True})
