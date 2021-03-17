@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import time
 import argparse
 import json
 import math
@@ -10,9 +11,7 @@ from copy import deepcopy
 from bs4 import BeautifulSoup
 from sqlalchemy.orm.exc import NoResultFound
 
-from utt.model import db, Station, FuelPriceEstimation
 from utt.util import today
-from utt import app
 
 from diskcache import Cache
 from datetime import date
@@ -21,29 +20,6 @@ from datetime import date
 DEBUG = False
 verbose = False
 
-
-def write_fuel_prices(prices, date=None):
-    if date is None:
-        date = today()
-    # delete old data for today
-    FuelPriceEstimation.query.filter_by(day=date).delete()
-
-    # add new data for today
-    for station_name, price in prices.items():
-        if verbose:
-            print('Writing data for {}'.format(station_name))
-        try:
-            station = Station.query.filter_by(name=station_name).one()
-            est = FuelPriceEstimation(
-                station=station,
-                day=date,
-                price_per_g=price,
-            ) 
-            db.session.add(est)
-        except NoResultFound:
-            print('Found no station {}'.format(station_name))
-            
-    db.session.commit()
 
 INTERVAL_THRESHOLD = 0.5
 
@@ -65,6 +41,7 @@ def _get_minmax(slug):
     a,b = price_range.split(" - ")
     mn = float(a)
     mx = float(b)
+    time.sleep(0.2)
     return (mn,mx)
 
 def get_minmax(cache, slug):
@@ -408,7 +385,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Tau Station Fuel Price Estimator, based on a model by Sotheryn and code by SandwichMaker')
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument('--debug', action='store_true')
-    parser.add_argument('--write', action='store_true')
+    parser.add_argument('--token', type=str)
+    parser.add_argument('--base-url', type=str, default='https://tracker.tauguide.de')
     options = parser.parse_args()
 
     if options.verbose:
@@ -426,6 +404,10 @@ if __name__ == '__main__':
         for station in stations_ascending:
             print("%8.2f  %s" % (fuel_prices[station], station))
 
-    if options.write:
-        with app.app_context():
-            write_fuel_prices(fuel_prices)
+    if options.token:
+        url = options.base_url + '/v1/fuel_estimation/add'
+        payload = {
+            'token': options.token,
+            'stations': fuel_prices,
+        }
+        requests.post(url, json=payload)
