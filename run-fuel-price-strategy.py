@@ -9,9 +9,6 @@ import sys
 from copy import deepcopy
 
 from bs4 import BeautifulSoup
-from sqlalchemy.orm.exc import NoResultFound
-
-from utt.util import today
 
 from diskcache import Cache
 from datetime import date
