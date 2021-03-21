@@ -6,6 +6,7 @@ import json
 import math
 import requests
 import sys
+import os
 from copy import deepcopy
 
 from bs4 import BeautifulSoup
@@ -383,6 +384,7 @@ if __name__ == '__main__':
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument('--debug', action='store_true')
     parser.add_argument('--token', type=str)
+    parser.add_argument('--token-from-env', action='store_true', help='read token from UTT_TOKEN')
     parser.add_argument('--base-url', type=str, default='https://tracker.tauguide.de')
     options = parser.parse_args()
 
@@ -401,10 +403,16 @@ if __name__ == '__main__':
         for station in stations_ascending:
             print("%8.2f  %s" % (fuel_prices[station], station))
 
+    # if token, send result to tracker
+    utt_token = None
     if options.token:
+        utt_token = options.token
+    if options.token_from_env:
+        utt_token = os.environ['UTT_TOKEN']
+    if utt_token:
         url = options.base_url + '/v1/fuel_estimation/add'
         payload = {
-            'token': options.token,
+            'token': utt_token,
             'stations': fuel_prices,
         }
         requests.post(url, json=payload)
