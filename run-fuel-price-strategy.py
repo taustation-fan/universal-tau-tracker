@@ -6,12 +6,10 @@ import json
 import math
 import requests
 import sys
+import os
 from copy import deepcopy
 
 from bs4 import BeautifulSoup
-from sqlalchemy.orm.exc import NoResultFound
-
-from utt.util import today
 
 from diskcache import Cache
 from datetime import date
@@ -385,7 +383,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Tau Station Fuel Price Estimator, based on a model by Sotheryn and code by SandwichMaker')
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument('--debug', action='store_true')
-    parser.add_argument('--token', type=str)
+    parser.add_argument('--token', type=str, default=os.environ.get('UTT_TOKEN'),
+            help='token for submitting data to tracker (default: read from environment variable UTT_TOKEN)')
     parser.add_argument('--base-url', type=str, default='https://tracker.tauguide.de')
     options = parser.parse_args()
 
@@ -404,6 +403,7 @@ if __name__ == '__main__':
         for station in stations_ascending:
             print("%8.2f  %s" % (fuel_prices[station], station))
 
+    # if token, send result to tracker
     if options.token:
         url = options.base_url + '/v1/fuel_estimation/add'
         payload = {
