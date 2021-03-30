@@ -18,8 +18,8 @@ from datetime import date
 DEBUG = False
 verbose = False
 
-
-INTERVAL_THRESHOLD = 0.5
+DEFAULT_TOLERANCE = 0.5
+MAX_TOLERANCE = 4.0
 
 
 def debug_print(*msg):
@@ -89,7 +89,7 @@ def entries_by_key(entries, key):
     return collected_entries
 
 
-def equals_approx(a, b, tolerance=1.0):
+def equals_approx(a, b, tolerance=DEFAULT_TOLERANCE):
     """
     Returns True if a==b within the given absolute tolerance.
     """
@@ -164,14 +164,14 @@ class Interval:
 
     def length(self):
         return (self.max - self.min)
-    def is_converged(self):
-        return self.length() < INTERVAL_THRESHOLD
+    def is_converged(self, threshold=DEFAULT_TOLERANCE):
+        return self.length() < threshold
     def __str__(self):
         return "[%.2f, %.2f]" % (self.min, self.max)
     def midpoint(self):
         return 0.5 * (self.min + self.max)
-    def contains(self, a):
-        return (a >= self.min - INTERVAL_THRESHOLD) and (a <= self.max + INTERVAL_THRESHOLD)
+    def contains(self, a, threshold=DEFAULT_TOLERANCE):
+        return (a >= self.min - threshold) and (a <= self.max + threshold)
 
 
 def get_fuel_prices(cache, strategy_file=None):
@@ -275,9 +275,11 @@ def get_fuel_prices(cache, strategy_file=None):
 
     # run over all stations again, if necessary multiple times
     iteration = 0
+    tolerance = DEFAULT_TOLERANCE
     while nconverged < nstations:
         iteration += 1
         debug_print("### PHASE 2 # Iteration=%d ###" % iteration)
+        debug_print("tolerance = %.3f" % tolerance)
         prev_nconverged = nconverged # to check progress
 
         for station in stations:
@@ -313,9 +315,9 @@ def get_fuel_prices(cache, strategy_file=None):
                     other_itemprice = other_fpc * other_fuelprice
                     debug_print("    available on %s for %.2f" % (other_station, other_itemprice))
                     # now check compatibility
-                    if not equals_approx(other_itemprice, itemprice_min):
+                    if not equals_approx(other_itemprice, itemprice_min, tolerance):
                         stations_compatible_with_min.remove(other_station)
-                    if not equals_approx(other_itemprice, itemprice_max):
+                    if not equals_approx(other_itemprice, itemprice_max, tolerance):
                         stations_compatible_with_max.remove(other_station)
 
                 # get this item's FPC on this station
@@ -329,7 +331,7 @@ def get_fuel_prices(cache, strategy_file=None):
                     assert(stations_compatible_with_min.pop() == station)
                     itemprice = itemprice_min
                     fuelprice = itemprice_min / fpc
-                    if not fuelprice_interval.contains(fuelprice):
+                    if not fuelprice_interval.contains(fuelprice, tolerance):
                         debug_print("    WARNING: min price %.2f only compatible here" % itemprice_min)
                         debug_print("             but fuelprice %.2f not inside %s" % (fuelprice, fuelprice_interval))
                         fuelprice = None
@@ -339,7 +341,7 @@ def get_fuel_prices(cache, strategy_file=None):
                     assert(stations_compatible_with_max.pop() == station)
                     itemprice = itemprice_max
                     fuelprice = itemprice_max / fpc
-                    if not fuelprice_interval.contains(fuelprice):
+                    if not fuelprice_interval.contains(fuelprice, tolerance):
                         debug_print("    WARNING: max price %.2f only compatible here" % itemprice_max)
                         debug_print("             but fuelprice %.2f not inside %s" % (fuelprice, fuelprice_interval))
                         fuelprice = None
@@ -357,8 +359,13 @@ def get_fuel_prices(cache, strategy_file=None):
         # check progress
         if nconverged == prev_nconverged:
             # no :(
-            debug_print("no progress, giving up")
-            break
+            debug_print("no progress")
+            if tolerance >= MAX_TOLERANCE:
+                debug_print("maximum tolerance reached, giving up")
+                break
+            else:
+                debug_print("trying again with larger tolerance")
+                tolerance *= 2
 
     debug_print("resolved %d/%d stations after %d iterations" % (nconverged, nstations, iteration))
 
