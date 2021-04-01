@@ -163,6 +163,7 @@ def fuel_stats_json(token):
         d = make_output_dict(r)
         if d is not None:
             rows.append(d)
+    rows.sort(key=lambda r: r.get('last_price') or r.get('estimation'))
     return jsonify({'stations': rows})
 
 @app.route('/fuel/lowest/<token>')
