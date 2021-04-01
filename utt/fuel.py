@@ -136,19 +136,33 @@ def fuel_stats_json(token):
     n = now()
 
     estimations = FuelPriceEstimation.today_as_dict()
-    
-
-    refuel = FPS.query.filter(FPS.last_reading >= today_datetime() ).order_by(FPS.last_price.asc())
-    rows = [{
+    ref_dt = today_datetime()
+    def make_output_dict(r):
+        has_current_reading = r.last_reading >= ref_dt
+        common = {
                 'station_short_name': r.station_short_name,
-                'last_price': r.last_price,
                 'estimation': estimations.get(r.station_short_name),
-                'last_reading': r.last_reading.isoformat(),
                 'station_name': r.station_name,
                 'system_name': r.system_name,
                 'min_price': r.min_price,
                 'max_price': r.max_price,
-             } for r in refuel]
+             }
+        if has_current_reading:
+            return dict(
+                **common,
+                last_price=r.last_price,
+                last_reading=r.last_reading.isoformat(),
+             )
+        elif common['estimation'] is not None:
+            return common
+        else:
+            return None
+
+    rows = []
+    for r in FPS.query.order_by(FPS.last_price.asc()):
+        d = make_output_dict(r)
+        if d is not None:
+            rows.append(d)
     return jsonify({'stations': rows})
 
 @app.route('/fuel/lowest/<token>')
