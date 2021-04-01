@@ -56,7 +56,6 @@ def improve_one(pair, interactive=True):
         count_periods = float(input('Rough number of periods in the plot: '))
         period = (max(x) - min(x))/ count_periods
         fudge_factor = 10
-
     phase = pair.fit_phase or 0.0
 
     est_freq = 1 / period

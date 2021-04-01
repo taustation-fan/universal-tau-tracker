@@ -138,7 +138,7 @@ def fuel_stats_json(token):
     estimations = FuelPriceEstimation.today_as_dict()
     
 
-    refuel = FPS.query.order_by(FPS.last_price.asc())
+    refuel = FPS.query.filter(FPS.last_reading >= today_datetime() ).order_by(FPS.last_price.asc())
     rows = [{
                 'station_short_name': r.station_short_name,
                 'last_price': r.last_price,
