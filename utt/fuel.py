@@ -176,6 +176,7 @@ def fuel_lowest(token):
     
     refuel = FPS.query.filter(FPS.last_reading > limit).order_by(FPS.last_price.asc())
     measured = {r.station_short_name: r.last_price for r in refuel}
+    measured_ts = {r.station_short_name: r.last_reading for r in refuel}
 
     estimations = FuelPriceEstimation.today_as_dict()
 
@@ -184,6 +185,7 @@ def fuel_lowest(token):
     rows = [{
                 'station_short_name': short,
                 'last_price': measured.get(short),
+                'measured_timestamp': measured_ts.get(short),
                 'estimated_price': estimations.get(short), 
              } for short in all_short_names]
     if compare:
