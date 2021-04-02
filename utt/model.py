@@ -248,7 +248,7 @@ class Ship(db.Model):
     captain = db.Column(db.String(), nullable=False)
     ship_class_id = db.Column(db.ForeignKey('ship_class.id'), nullable=False)
     ship_class = db.relationship('ShipClass')
-    sightings = db.relationship('ShipSighting', order_by='asc(ShipSighting.when)')
+    sightings = db.relationship('ShipSighting', order_by='asc(ShipSighting.when)', backref='ship')
 
     key = 'registration'
 
@@ -327,7 +327,6 @@ class ShipSightingStreak:
 class ShipSighting(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     ship_id = db.Column(db.ForeignKey('ship.id'), nullable=False)
-    ship = db.relationship('Ship')
     station_id = db.Column(db.ForeignKey('station.id'), nullable=False)
     station = db.relationship('Station')
     when = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.utcnow)
