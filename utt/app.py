@@ -3,6 +3,7 @@ from utt.model import db
 from flask_cors import CORS
 from flask import Flask, render_template, send_from_directory
 from .gct import as_gct
+import json
 
 static_file_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'static')
 
@@ -30,3 +31,6 @@ def static_files(path):
 def static_file_favicon():
     return send_from_directory('static', 'favicon.ico')
 
+@app.template_filter(name='json')
+def encode_jsonjson(s):
+    return json.dumps(s)

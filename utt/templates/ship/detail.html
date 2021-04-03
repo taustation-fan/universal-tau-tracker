@@ -1,9 +1,16 @@
 {% extends "base.html" %}
 {% block title %}Tau Station: {{ ship.name|escape }} in the Ship Registry{% endblock %}
 {% block content %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="/static/multi-timeline.min.css"/>
+    <script src="/static/jquery-3.3.1.min.js"></script>
+    <script src="/static/moment.min.js"></script>
+    <script src="/static/multi-timeline.min.js"></script>
+{% endblock %}
 {% from 'macros.html' import gct %}
 
-<h2 id="details">Ship Details</h2>
+<h2 id="details">Ship Details for {{ship.name|escape}}</h2>
 
 <table>
     <tbody>
@@ -38,6 +45,19 @@
 {% endif %}
 
 <h2 id="sightings">Sightings Timeline</h2>
+
+<div class="multi-timeline"></div>
+
+<script type="text/javascript">
+$('.multi-timeline').multiTimeline({
+    start: "{{ timeline.start.isoformat() }}",
+    end: "{{ timeline.end.isoformat() }}",
+    xAxisDateFormat:  'YYYY-MM-DD',
+    xAxisUnit:        'days',
+    markerDateFormat: 'YYYY-MM-DD',
+    data: {{ timeline.data | safe }}
+});
+</script>
 
 <table>
     <thead>

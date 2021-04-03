@@ -1,17 +1,22 @@
-from datetime import datetime, timezone
+import json
+from datetime import datetime, timezone, timedelta
 
 from sqlalchemy.orm.exc import NoResultFound
 from flask import request, jsonify, render_template
 
 from utt.app import app
 from utt.gct import as_gct
-from utt.model import db, \
-    autovivify, \
-    get_station, \
-    Token, \
-    Ship, \
-    ShipClass, \
-    ShipSighting 
+from utt.model import (
+    db,
+    autovivify,
+    get_station,
+    Token,
+    Ship,
+    ShipClass,
+    ShipSighting ,
+    Station,
+    System,
+)
 
 def now():
     return datetime.now(timezone.utc)
@@ -50,8 +55,32 @@ def ship_overview():
 
     return render_template('ship/overview.html', ships=ships)
 
+def ship_timeline(ship):
+    stations = Station.query.join(System).filter(Station.id.in_(
+        db.session.query(ShipSighting.station_id).filter(ShipSighting.ship_id == ship.id)
+    )).order_by(System.rank.asc(), Station.name.asc()).all()
+    layers = {station.id: layer for layer, station in enumerate(stations)}
+
+    sightings = ship.sightings
+    timeline_start = sightings[0].when.date()
+    timeline_end = sightings[-1].when.date() + timedelta(days=1)
+    data = []
+    for s in ship.sighting_streaks:
+        data.append({
+            'title': s.station.short or s.station.name,
+            'start': s.first.when.isoformat(),
+            'end':   s.last.when.isoformat(),
+            'layer': layers[s.station.id],
+        })
+    layers_seen = {d['layer'] for d in data}
+    return {
+        'start': timeline_start,
+        'end': timeline_end,
+        'data': json.dumps(data),
+    }
+
 @app.route('/ship/<registration>')
 def ship_detail(registration):
     ship = Ship.query.filter_by(registration=registration).one()
 
-    return render_template('ship/detail.html', ship=ship)
+    return render_template('ship/detail.html', ship=ship, timeline=ship_timeline(ship))
