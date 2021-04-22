@@ -35,7 +35,7 @@ class System(db.Model):
     name = db.Column(db.String(200), unique=True, nullable=False)
     rank = db.Column(db.Integer)
 
-    __mapper_args__ = {'order_by': ['rank', 'name']}
+   #  __mapper_args__ = {'order_by': ['rank', 'name']}
 
     @property
     def stations_sorted(self):

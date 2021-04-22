@@ -6,10 +6,10 @@
 
 <table class="sortable">
     <thead>
-        <tr>
-            <th>Name</th>
-            <th>Tier</th>
-            <th>Rarity</th>
+        <tr role="row" class="tablesorter-headerRow">
+            <th data-column="0" class="tablesorter-header tablesorter-headerUnSorted" tabindex="0" scope="col" role="columnheader" aria-disabled="false" unselectable="on" style="user-select: none;" aria-sort="none">Name</th>
+            <th class="tier filter-select" data-placeholder="Any">Tier</th>
+            <th class="rarity filter-select" data-placeholder="Any">Rarity</th>
             <th>Mass (kg)</th>
 {% if type_name == 'Armor' %}
             <th>Piercing Defense</th>
@@ -40,7 +40,7 @@
     </thead>
     <tbody>
 {% for item in items %}
-        <tr>
+        <tr role="row">
             <th><a href="/item/detail/{{item.id}}">{{item.name | escape }}</a></th>
             <td>{{item.tier}}</td>
             <td>{{item.rarity.name}}</td>
@@ -59,8 +59,8 @@
     {% if aspect_weapon %}
             <td>{{aspect_weapon.accuracy|round(3)}}</td>
             <td>{{aspect_weapon.hand_to_hand}}</td>
-            <td>{{aspect_weapon.weapon_range.name}}</td>
-            <td>{{aspect_weapon.weapon_type.name}}</td>
+            <td>{{aspect_weapon.weapon_range.name|escape}}</td>
+            <td>{{aspect_weapon.weapon_type.name|escape}}</td>
             <td>{{aspect_weapon.piercing_damage|round(2)}}</td>
             <td>{{aspect_weapon.impact_damage|round(2)}}</td>
             <td>{{aspect_weapon.energy_damage|round(2)}}</td>
@@ -95,8 +95,24 @@
     </tbody>
 </table>
 
-{% from 'macros.html' import tablesorter %}
-{{ tablesorter('.sortable') }}
+<script>
+$(function() {
+    $('.sortable').tablesorter({
+        widthFixed: false,
+        widgets: ['zebra', 'filter'],
+        widgetOptions : {
+            filter_columnFilters: true,
+            filter_external : '.search',
+            filter_hideFilters: false,
+            filter_ignoreCase  : true,
+            filter_searchDelay : 300,
+            filter_functions : {
+                '.rarity': true,
+            },
+        },
+    });
+});
+</script>
 
 {% endblock %}
 
