@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Tau Station: all items with vendors{% endblock %}
+{% block content %}
+    {% from 'macros.html' import link_item, link_vendor, tablesorter %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Vendors that sell this item</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>{{ link_item(item) }}</td>
+                <td>
+                    {% set vendors = item.current_inventories | map(attribute='vendor') %}
+                    {% if vendors %}
+                        {% for v in vendors |sort(attribute='station.level,station.name') %}
+                        <ul>
+                            <li>{{ link_vendor(v) }} on {{ (v.station.short or v.station.name) | escape }}</li>
+                        </ul>
+                        {% endfor %}
+                    {% else %}
+                        (no known vendors)
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+{% endblock %}
