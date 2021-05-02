@@ -18,6 +18,7 @@ so numbers are not comparable across categories.</p>
             <th class="right">Distance<br>pairs</th>
             <th class="right">Fuel</br>price</th>
             <th class="right">Ship<br>positions</th>
+            <th class="right">Shuttle<br>Prices</th>
             <th class="right">Items</th>
             <th class="right">Item Comments</th>
             <th class="right">Vendor Inventories</th>
@@ -33,6 +34,7 @@ so numbers are not comparable across categories.</p>
                 <td class="right">{{ contributors[c].get('distance', 0) }}</td>
                 <td class="right">{{ contributors[c].get('fuel', 0) }}</td>
                 <td class="right">{{ contributors[c].get('ship', 0) }}</td>
+                <td class="right">{{ contributors[c].get('shuttle_price', 0) }}</td>
                 <td class="right">{{ contributors[c].get('item', 0) }}</td>
                 <td class="right">{{ contributors[c].get('item_comment', 0) }}</td>
                 <td class="right">{{ contributors[c].get('vendor_inventory', 0) }}</td>

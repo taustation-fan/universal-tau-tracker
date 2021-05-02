@@ -3,17 +3,20 @@ from flask import request, jsonify, render_template
 from sqlalchemy import func
 
 from utt.app import app
-from utt.model import db, \
-    CareerBatchSubmission, \
-    Character, \
-    FuelPriceReading, \
-    Item, \
-    ItemComment, \
-    ShipSighting, \
-    StationDistanceReading, \
-    VendorInventory, \
-    VendorItemPriceReading, \
-    Token
+from utt.model import (
+    db,
+    CareerBatchSubmission,
+    Character,
+    FuelPriceReading,
+    Item,
+    ItemComment,
+    ShipSighting,
+    ShuttlePriceReading,
+    StationDistanceReading,
+    VendorInventory,
+    VendorItemPriceReading,
+    Token,
+)
 
 @app.route('/contributor')
 def contributor_statistics():
@@ -28,6 +31,7 @@ def contributor_statistics():
         ('career', CareerBatchSubmission),
         ('fuel', FuelPriceReading),
         ('ship', ShipSighting),
+        ('shuttle_price', ShuttlePriceReading),
         ('distance', StationDistanceReading),
         ('item', Item),
         ('item_comment', ItemComment),
