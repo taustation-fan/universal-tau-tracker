@@ -53,11 +53,14 @@ def add_distance():
         destination = get_station(payload['system'], schedule['destination'])
         pair = get_station_pair(station, destination)
         for d_tuple  in distances:
-            try:
-                departure, distance, travel_time = d_tuple
-            except ValueError:
-                departure, distance = d_tuple
-                travel_time = None
+            
+            price = None
+            distance = None
+            departure, distance, *rest = d_tuple
+            if len(rest):
+                travel_time = rest[0]
+            if len(rest) >= 2:
+                price = rest[1]
             if not isinstance(distance, (int, float)):
                 continue
             distance = int(distance)
