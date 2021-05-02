@@ -55,7 +55,7 @@ def add_distance():
         for d_tuple  in distances:
             
             price = None
-            distance = None
+            travel_time = None
             departure, distance, *rest = d_tuple
             if len(rest):
                 travel_time = rest[0]
