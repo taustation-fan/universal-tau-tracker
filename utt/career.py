@@ -151,7 +151,7 @@ def career_station_needs_update(system, station):
     except AssertionError:
         return jsonify({'needs_update': True})
 
-    return jsonify({'needs_update': station.needs_career_update})
+    return jsonify({'needs_update': st.needs_career_update})
 
 @app.route('/career')
 def career_overview():
