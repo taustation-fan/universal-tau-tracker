@@ -55,6 +55,25 @@ class Station(db.Model):
     fit_period_u = db.Column(db.Float)
     # fit_phase = db.Column(db.Float)
 
+    def _filter_model_by_station_and_today(self, model, station_id_column):
+        from .util import today_datetime
+        existing = model.query.filter(model.when > today_datetime())\
+            .filter(station_id_column == self.id) \
+            .order_by(model.when.desc()).first()
+        return existing is None
+
+    @property
+    def needs_career_update(self):
+        return self._filter_model_by_station_and_today(CareerBatchSubmission, CareerBatchSubmission.station_id)
+
+    @property
+    def needs_fuel_update(self):
+        return self._filter_model_by_station_and_today(FuelPriceReading, FuelPriceReading.station_id)
+
+    @property
+    def needs_shuttle_update(self):
+        return self._filter_model_by_station_and_today(ShuttlePriceReading, ShuttlePriceReading.source_station_id)
+
 class Character(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)

@@ -150,12 +150,8 @@ def career_station_needs_update(system, station):
         st = get_station(system, station, create=False)
     except AssertionError:
         return jsonify({'needs_update': True})
-        
-    existing = CareerBatchSubmission.query.filter(CareerBatchSubmission.when > today_datetime()).filter_by(station_id=st.id) \
-             .order_by(CareerBatchSubmission.when.desc()).first()
-    result = existing is None
 
-    return jsonify({'needs_update': result})
+    return jsonify({'needs_update': station.needs_career_update})
 
 @app.route('/career')
 def career_overview():

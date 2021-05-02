@@ -10,6 +10,7 @@
             <th>System</th>
             <th>Code</th>
             <th>Level</th>
+            <th>Needs data</th>
         </tr>
     </thead>
     <tbody>
@@ -19,6 +20,13 @@
                 <td>{{ station.system.name | escape }}</td>
                 <td>{{ station.short | escape }}</td>
                 <td>{{ station.level or '' }}</td>
+                <td>
+                    <ul>
+                        {% if station.needs_career_update %}<li><a href="https://taustation.space/career">Career tasks</a></li> {% endif %}
+                        {% if station.needs_fuel_update %}<li><a href="https://taustation.space/travel/area/docks">Docks</a></li> {% endif %}
+                        {% if station.needs_shuttle_update %}<li><a href="https://taustation.space/travel/area/local-shuttles">Shuttles</a></li> {% endif %}
+                    </ul>
+                </td>
             </tr>
 
         {% endfor %}
@@ -29,7 +37,7 @@
 {{ tablesorter('.sortable') }}
 <script>
 $(function() {
-    $('#stations').css('max-width', '30em');
+    $('#stations').css('max-width', '40em');
 });
 </script>
 
