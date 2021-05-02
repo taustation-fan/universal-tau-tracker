@@ -9,6 +9,7 @@
             <th>Name</th>
             <th>System</th>
             <th>Code</th>
+            <th>Level</th>
         </tr>
     </thead>
     <tbody>
@@ -17,6 +18,7 @@
                 <td>{{ station.name | escape }}</td>
                 <td>{{ station.system.name | escape }}</td>
                 <td>{{ station.short | escape }}</td>
+                <td>{{ station.level or '' }}</td>
             </tr>
 
         {% endfor %}
