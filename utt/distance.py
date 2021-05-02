@@ -71,7 +71,7 @@ def add_distance():
 
             departure = parse_gct(departure) or departure
             if price is not None and first_price_ratio is None:
-                price = re.sub(r',', '')
+                price = re.sub(r',', '', price)
                 price = float(price)
                 first_price_ratio = price / distance
 
