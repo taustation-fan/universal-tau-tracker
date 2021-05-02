@@ -53,6 +53,7 @@ class Station(db.Model):
     name_lower = db.Column(db.String(200), unique=True, nullable=False)
     fit_radius_km = db.Column(db.Float)
     fit_period_u = db.Column(db.Float)
+    has_public_shuttles = db.Column(db.Boolean(), nullable=False, default=True)
     # fit_phase = db.Column(db.Float)
 
     def _filter_model_by_station_and_today(self, model, station_id_column):
@@ -72,7 +73,7 @@ class Station(db.Model):
 
     @property
     def needs_shuttle_update(self):
-        return self._filter_model_by_station_and_today(ShuttlePriceReading, ShuttlePriceReading.source_station_id)
+        return self.has_public_shuttles and self._filter_model_by_station_and_today(ShuttlePriceReading, ShuttlePriceReading.source_station_id)
 
 class Character(db.Model):
     id = db.Column(db.Integer, primary_key=True)
