@@ -194,6 +194,18 @@ class StationDistanceReading(db.Model):
     token_id = db.Column(db.ForeignKey('token.id'), nullable=False)
     token = db.relationship('Token')
 
+class ShuttlePriceReading(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    source_station_id = db.Column(db.ForeignKey('station.id'), nullable=False)
+    source_station = db.relationship('Station', foreign_keys=[source_station_id])
+
+    destination_station_id = db.Column(db.ForeignKey('station.id'), nullable=False)
+    destination_station = db.relationship('Station', foreign_keys=[destination_station_id])
+    when = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.utcnow)
+    price_per_distance = db.Column(db.Float, nullable=False)
+    token_id = db.Column(db.ForeignKey('token.id'), nullable=False)
+    token = db.relationship('Token')
+
 ## Fuel Price Tracking
 class FuelPriceReading(db.Model):
     id = db.Column(db.Integer, primary_key=True)

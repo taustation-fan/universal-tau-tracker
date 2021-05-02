@@ -17,16 +17,19 @@ from sqlalchemy import func
 from .app import app
 
 from utt.gct import as_gct, parse_gct, gct_duration
-from utt.model import db, \
-                      get_station, \
-                      get_station_pair, \
-                      System, \
-                      Station, \
-                      Character, \
-                      Token, \
-                      StationPair, \
-                      StationDistanceReading, \
-                      InvalidTokenException
+from utt.model import (
+    db,
+    get_station,
+    get_station_pair,
+    System,
+    Station,
+    Character,
+    Token,
+    ShuttlePriceReading,
+    StationPair,
+    StationDistanceReading,
+    InvalidTokenException,
+)
 
 @app.route('/v1/distance/add', methods=['POST'])
 def add_distance():
@@ -52,6 +55,7 @@ def add_distance():
             continue
         destination = get_station(payload['system'], schedule['destination'])
         pair = get_station_pair(station, destination)
+        first_price_ratio = None
         for d_tuple  in distances:
             
             price = None
@@ -64,7 +68,13 @@ def add_distance():
             if not isinstance(distance, (int, float)):
                 continue
             distance = int(distance)
+
             departure = parse_gct(departure) or departure
+            if price is not None and first_price_ratio is None:
+                price = re.sub(r',', '')
+                price = float(price)
+                first_price_ratio = price / distance
+
             count += 1
             existing = StationDistanceReading.query.filter_by(
                 station_pair_id=pair.id,
@@ -85,6 +95,15 @@ def add_distance():
                     token=token,
                 )
                 db.session.add(sdr)
+        if first_price_ratio is not None:
+            db.session.add(
+                ShuttlePriceReading(
+                    source_station=station,
+                    destination_station=destination,
+                    price_per_distance=first_price_ratio,
+                    token=token,
+                )
+            )
     db.session.commit()
     print('Recorded {} distance pairs ({} new) for {} by {}'.format(count, new, payload['source'], token.character.name))
     return jsonify({'recorded': True, 'message': 'Recorded {} distance pairs, of which {} were new. +1 brownie point'.format(count, new)})
