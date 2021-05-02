@@ -49,6 +49,7 @@ def add_distance():
     station = get_station(payload['system'], payload['source'])
     count = 0
     new = 0
+    price_count = 0
     for schedule in payload['schedules']:
         distances = [t for t in schedule['distances'] if t[0] and t[1]]
         if not distances:
@@ -97,6 +98,7 @@ def add_distance():
                 )
                 db.session.add(sdr)
         if first_price_ratio is not None:
+            price_count += 1
             db.session.add(
                 ShuttlePriceReading(
                     source_station=station,
@@ -106,7 +108,7 @@ def add_distance():
                 )
             )
     db.session.commit()
-    print('Recorded {} distance pairs ({} new) for {} by {}'.format(count, new, payload['source'], token.character.name))
+    print('Recorded {} distance pairs ({} new, {} prices) for {} by {}'.format(count, new, price_count, payload['source'], token.character.name))
     return jsonify({'recorded': True, 'message': 'Recorded {} distance pairs, of which {} were new. +1 brownie point'.format(count, new)})
 
 def get_station_pairs(system):
