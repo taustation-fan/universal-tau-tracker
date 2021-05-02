@@ -245,7 +245,8 @@ function extract_local_shuttles(options, station) {
         if (distances.length) {
             schedules.push({'destination': destination, 'distances': distances});
         }
-    })    if (schedules.length == 0) {
+    })
+    if (schedules.length == 0) {
         return;
     }
     var payload = {
