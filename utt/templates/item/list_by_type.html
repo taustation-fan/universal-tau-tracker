@@ -80,12 +80,12 @@
 {% elif type_name == 'Medical' %}
     {% set aspect_medical = item.aspect_medical %}
     {% if aspect_medical %}
-            <td>{{ aspect_medical.strength_boost| round(1) }}</td>
-            <td>{{ aspect_medical.agility_boost| round(1) }}</td>
-            <td>{{ aspect_medical.stamina_boost| round(1) }}</td>
-            <td>{{ aspect_medical.intelligence_boost| round(1) }}</td>
-            <td>{{ aspect_medical.social_boost| round(1) }}</td>
-            <td>{{ aspect_medical.base_toxicity| int }}</td>
+            <td>{{ aspect_medical.strength_boost| round(2) }}</td>
+            <td>{{ aspect_medical.agility_boost| round(2) }}</td>
+            <td>{{ aspect_medical.stamina_boost| round(2) }}</td>
+            <td>{{ aspect_medical.intelligence_boost| round(2) }}</td>
+            <td>{{ aspect_medical.social_boost| round(2) }}</td>
+            <td>{{ aspect_medical.base_toxicity| round(1) }}</td>
     {% else %}
             <td></td> <td></td> <td></td> <td></td> <td></td> <td></td>
     {% endif %}
