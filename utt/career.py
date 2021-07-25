@@ -76,7 +76,15 @@ def career_task_add():
             bonus=bonus,
         )
         db.session.add(tr)
-        factors.append(tr.factor)
+        f = tr.factor
+        factors.append(f)
+        if f > 2.1:
+            print('SUSPICIOUS READING of factor {}, station {}, task {}, token {}'.format(
+                f,
+                station_name,
+                task,
+                token.id,
+            ))
     factor = max(factors);
     batch.factor = factor
     if factor:
