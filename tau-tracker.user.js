@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Tau Station Universal Tracker
-// @version      1.13
+// @version      1.14
 // @author       Moritz Lenz <moritz.lenz@gmail.com>
 // @description  General data collection script for Tau Station. Please get an access token from moritz and add it in your preferences page.
 // @match        https://taustation.space/*
@@ -540,7 +540,7 @@ function extract_item(options) {
 
     let loc = location.href.split('/').pop();
     let item_slug = loc.split('?')[0]; // remove any potential GET parameters
-    let item_name = $('h1.name').text();
+    let item_name = $('h2.name').text();
     if (!item_name)
         return;
 
