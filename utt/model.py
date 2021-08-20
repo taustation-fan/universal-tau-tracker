@@ -487,7 +487,9 @@ class Item(db.Model):
         result = {
             'slug': self.slug,
             'name': self.name,
+            'tier': self.tier,
             'type': self.item_type.name,
+            'mass_kg': self.mass_kg,
             'rarity': self.rarity.name,
             'description': self.description,
         }
