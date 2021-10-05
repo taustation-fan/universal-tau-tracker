@@ -271,6 +271,8 @@ def get_positions(system, time):
     positions = [StationPosition(base, time, initial_phase)]
     for station in stations:
         pair = get_station_pair(station, base)
+        if pair.fit_period_u is None:
+            continue
         arg = time / pair.fit_period_u
         arg -= int(arg)
         phase = pair.fit_phase + 2 * np.pi * arg
