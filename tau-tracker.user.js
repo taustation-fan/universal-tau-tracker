@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Tau Station Universal Tracker
-// @version      1.15
+// @version      1.15.1
 // @author       Moritz Lenz <moritz.lenz@gmail.com>
 // @description  General data collection script for Tau Station. Please get an access token from moritz and add it in your preferences page.
 // @match        https://taustation.space/*
@@ -135,16 +135,9 @@ function utt_init_message_ui() {
 
 function get_station()
 {
-    // Class containing station and system
-    var className = "css-7fqfou";
-
-    // Might have to refresh to get the class to load in before this script runs
-    if ($("." + className).length !== 0)
-    {
-        return {
-            station: $("." + className)[0].childNodes[0].data,
-            system: $("." + className)[0].childNodes[2].data,
-        }
+    return {
+        station: window.FrameState.location.station,
+        system: window.FrameState.location.star
     }
 }
 
