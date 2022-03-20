@@ -135,9 +135,24 @@ function utt_init_message_ui() {
 
 function get_station()
 {
-    return {
-        station: window.FrameState.location.station,
-        system: window.FrameState.location.star
+    // Class containing station and system
+    var className = "css-7fqfou";
+
+    // Might have to refresh to get the class to load in before this script runs
+    if ($("." + className).length !== 0)
+    {
+        return {
+            station: $("." + className)[0].childNodes[0].data,
+            system: $("." + className)[0].childNodes[2].data,
+        }
+    }
+    // Alternative method
+    else if (window.FrameState)
+    {
+        return {
+            station: window.FrameState.location.station,
+            system: window.FrameState.location.star
+        }
     }
 }
 
