@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Tau Station Universal Tracker
-// @version      1.14
+// @version      1.15
 // @author       Moritz Lenz <moritz.lenz@gmail.com>
 // @description  General data collection script for Tau Station. Please get an access token from moritz and add it in your preferences page.
 // @match        https://taustation.space/*
@@ -24,6 +24,21 @@ var utt_init_message_ui_done;
 function enrich_version(payload) {
     payload.script_version = GM_info.script.version;
     return payload;
+}
+
+// Hack to get fuel messages into docks
+function utt_add_fuel_message(message, color)
+{
+    if (!color) {
+        color = "green";
+    }
+
+    // Append message to element containing ship action buttons
+    $($(".ship-actions")[0]).append(
+        "<li style='background-color: " + color + ";'>" +
+        "Tau Tracker: " + message +
+        "</li>"
+    );
 }
 
 function utt_add_message(message, color) {
@@ -118,13 +133,17 @@ function utt_init_message_ui() {
 // end stuff stolen from tauhead
 
 
-function get_station() {
-    var full_station = $('span.station').text().trim();
-    var match = full_station.match(/([^,]+), (.*?)\s+system/);
-    if (match) {
+function get_station()
+{
+    // Class containing station and system
+    var className = "css-7fqfou";
+
+    // Might have to refresh to get the class to load in before this script runs
+    if ($("." + className).length !== 0)
+    {
         return {
-            station: match[1],
-            system: match[2],
+            station: $("." + className)[0].childNodes[0].data,
+            system: $("." + className)[0].childNodes[2].data,
         }
     }
 }
@@ -356,7 +375,7 @@ function extract_docks_ships(token, options, station) {
 function extract_docks(options, station) {
     var token = options.token;
     if (!token) {
-        utt_add_message('Please configure your access token in the user preferences', 'orange');
+        utt_add_fuel_message('Please configure your access token in the user preferences', 'orange');
         return;
     }
     if ($('html').hasClass('cockpit')) {
@@ -463,14 +482,14 @@ function extract_docks_fuel(token, options, station) {
                 } else {
                     message = 'Fuel price recorded. +1 brownie point!<br>' + response.message;
                 }
-                utt_add_message(message);
+                utt_add_fuel_message(message);
             }
             else {
-                utt_add_message('error recording fuel price: ' + response.message, 'orange');
+                utt_add_fuel_message('error recording fuel price: ' + response.message, 'orange');
             }
         },
         error: function(xhr) {
-            utt_add_message('cannot talk to ' + url + ': ' + xhr.response_text, 'orange');
+            utt_add_fuel_message('cannot talk to ' + url + ': ' + xhr.response_text, 'orange');
         },
     });
 }
